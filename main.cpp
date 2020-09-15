@@ -5,6 +5,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setWindowIcon(QIcon(":/images/icon.ico"));
     PgDialog d(QObject::tr("Печать пластиковых этикеток"));
     if (d.exec()!=QDialog::Accepted) exit(1);
     MainWindow w;

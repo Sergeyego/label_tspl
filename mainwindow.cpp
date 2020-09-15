@@ -10,8 +10,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->dateEditBeg->setDate(QDate::currentDate().addDays(-QDate::currentDate().dayOfYear()+1));
     ui->dateEditEnd->setDate(QDate(QDate::currentDate().year(),12,31));
 
-    ui->actionPart->setIcon(this->style()->standardIcon(QStyle::SP_BrowserReload));
+    ui->tableViewPart->verticalHeader()->setDefaultSectionSize(ui->tableViewPart->verticalHeader()->fontMetrics().height()*1.5);
+    ui->tableViewOdobr->verticalHeader()->setDefaultSectionSize(ui->tableViewOdobr->verticalHeader()->fontMetrics().height()*1.5);
 
+    ui->actionPart->setIcon(this->style()->standardIcon(QStyle::SP_BrowserReload));
+    ui->actionSrc->setIcon(QIcon::fromTheme("document-print"));
+    ui->actionPack->setIcon(QIcon::fromTheme("document-print"));
+    ui->actionExit->setIcon(this->style()->standardIcon(QStyle::SP_DialogCancelButton));
+
+    ui->toolButtonSrc->setDefaultAction(ui->actionSrc);
+    ui->toolButtonPack->setDefaultAction(ui->actionPack);
     ui->toolButtonUpd->setDefaultAction(ui->actionPart);
 
     modelTu = new ModelRo(this);
@@ -19,6 +27,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     modelVol = new ModelRo(this);
     modelNam = new ModelRo(this);
+
+    modelOdobr = new ModelRo(this);
+    ui->tableViewOdobr->setModel(modelOdobr);
 
     ui->comboBoxVol->setModel(modelVol);
     ui->comboBoxNam->setModel(modelNam);
@@ -45,6 +56,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->tableViewPart->selectionModel(),SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),mapper,SLOT(setCurrentModelIndex(QModelIndex)));
     connect(ui->tableViewPart->selectionModel(),SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),this,SLOT(refreshData(QModelIndex)));
     connect(ui->actionPart,SIGNAL(triggered(bool)),this,SLOT(updPart()));
+    connect(ui->actionSrc,SIGNAL(triggered(bool)),this,SLOT(createSrcLabel()));
+    connect(ui->actionPack,SIGNAL(triggered(bool)),this,SLOT(createPackLabel()));
+    connect(ui->actionExit,SIGNAL(triggered(bool)),this,SLOT(close()));
 
     updPart();
 }
@@ -52,6 +66,23 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+bool MainWindow::printData(const QString &data)
+{
+    QTcpSocket tcpSocket;
+    QTextCodec *codec = QTextCodec::codecForName("Windows-1251");
+    tcpSocket.connectToHost(/*ui->lineEdit->text()*/"192.168.1.118", /*ui->spinBox->value()*/9100);
+    bool ok=tcpSocket.waitForConnected(1000);
+    if (ok) {
+        tcpSocket.write(codec->fromUnicode(data));
+        tcpSocket.waitForBytesWritten();
+        tcpSocket.disconnectFromHost();
+        tcpSocket.waitForDisconnected();
+    } else {
+        QMessageBox::critical(this,tr("Ошибка"),tcpSocket.errorString(),QMessageBox::Ok);
+    }
+    return ok;
 }
 
 void MainWindow::updPart()
@@ -111,7 +142,7 @@ void MainWindow::updPart()
 
 void MainWindow::refreshData(QModelIndex index)
 {
-    int id_part=ui->tableViewPart->model()->data(ui->tableViewPart->model()->index(index.row(),1),Qt::EditRole).toInt();
+    int id_part=ui->tableViewPart->model()->data(ui->tableViewPart->model()->index(index.row(),0),Qt::EditRole).toInt();
     QSqlQuery tuQuery;
     tuQuery.prepare("select g.nam from wire_gost as w "
                     "inner join gost_new as g on w.id_gost=g.id "
@@ -119,7 +150,33 @@ void MainWindow::refreshData(QModelIndex index)
     tuQuery.bindValue(":id",id_part);
     if (modelTu->execQuery(tuQuery)){
         ui->listViewGost->setModelColumn(1);
-        modelTu->setHeaderData(1,Qt::Horizontal,QString::fromUtf8("название"));
+        modelTu->setHeaderData(1,Qt::Horizontal,QString::fromUtf8("Название"));
     }
+
+    QSqlQuery sertQuery;
+    sertQuery.prepare("select i.id_doc_t, i.ved_short, i.grade "
+                      "from zvd_get_wire_sert( "
+                      "(select dat from wire_parti_m where id= (select p.id_m from wire_parti as p where p.id= :id1 ) ), "
+                      "(select id_provol from wire_parti_m where id= (select p.id_m from wire_parti as p where p.id= :id2 ) ), "
+                      "(select id_diam from wire_parti_m where id= (select p.id_m from wire_parti as p where p.id= :id3 ) ) "
+                      ") as i group by i.id_doc_t, i.ved_short, i.grade order by i.id_doc_t ");
+    sertQuery.bindValue(":id1",id_part);
+    sertQuery.bindValue(":id2",id_part);
+    sertQuery.bindValue(":id3",id_part);
+    if (modelOdobr->execQuery(sertQuery)){
+        ui->tableViewOdobr->setColumnHidden(0,true);
+        ui->tableViewOdobr->resizeColumnsToContents();
+        modelOdobr->setHeaderData(1,Qt::Horizontal,QString::fromUtf8("Ведомство"));
+        modelOdobr->setHeaderData(2,Qt::Horizontal,QString::fromUtf8("Категория"));
+    }
+}
+
+void MainWindow::createSrcLabel()
+{
+
+}
+
+void MainWindow::createPackLabel()
+{
 
 }

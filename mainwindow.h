@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QSqlQuery>
 #include <QDataWidgetMapper>
+#include <QTcpSocket>
+#include <QTextCodec>
 #include "modelro.h"
 
 namespace Ui {
@@ -24,11 +26,15 @@ private:
     ModelRo *modelTu;
     ModelRo *modelVol;
     ModelRo *modelNam;
+    ModelRo *modelOdobr;
     QDataWidgetMapper *mapper;
+    bool printData(const QString &data);
 
 private slots:
     void updPart();
     void refreshData(QModelIndex index);
+    void createSrcLabel();
+    void createPackLabel();
 };
 
 #endif // MAINWINDOW_H

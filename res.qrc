@@ -4,5 +4,6 @@
         <file>images/simb.png</file>
         <file>images/site.png</file>
         <file>images/wire.png</file>
+        <file>images/icon.ico</file>
     </qresource>
 </RCC>
