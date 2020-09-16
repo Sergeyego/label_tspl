@@ -7,6 +7,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    loadSettings();
+
+    refreshDocType();
+
     ui->dateEditBeg->setDate(QDate::currentDate().addDays(-QDate::currentDate().dayOfYear()+1));
     ui->dateEditEnd->setDate(QDate(QDate::currentDate().year(),12,31));
 
@@ -59,12 +63,17 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionSrc,SIGNAL(triggered(bool)),this,SLOT(createSrcLabel()));
     connect(ui->actionPack,SIGNAL(triggered(bool)),this,SLOT(createPackLabel()));
     connect(ui->actionExit,SIGNAL(triggered(bool)),this,SLOT(close()));
+    connect(ui->actionPrintCfg,SIGNAL(triggered(bool)),this,SLOT(settings()));
+
+    connect(ui->actionViewSrc,SIGNAL(triggered(bool)),this,SLOT(viewCmdSrc()));
+    connect(ui->actionViewPack,SIGNAL(triggered(bool)),this,SLOT(viewCmdPack()));
 
     updPart();
 }
 
 MainWindow::~MainWindow()
 {
+    saveSettings();
     delete ui;
 }
 
@@ -72,17 +81,160 @@ bool MainWindow::printData(const QString &data)
 {
     QTcpSocket tcpSocket;
     QTextCodec *codec = QTextCodec::codecForName("Windows-1251");
-    tcpSocket.connectToHost(/*ui->lineEdit->text()*/"192.168.1.118", /*ui->spinBox->value()*/9100);
+    tcpSocket.connectToHost(ipAdr,port);
     bool ok=tcpSocket.waitForConnected(1000);
     if (ok) {
         tcpSocket.write(codec->fromUnicode(data));
         tcpSocket.waitForBytesWritten();
         tcpSocket.disconnectFromHost();
-        tcpSocket.waitForDisconnected();
     } else {
-        QMessageBox::critical(this,tr("Ошибка"),tcpSocket.errorString(),QMessageBox::Ok);
+        QMessageBox::critical(this,QString::fromUtf8("Ошибка"),tcpSocket.errorString(),QMessageBox::Ok);
     }
     return ok;
+}
+
+QString MainWindow::getCodSrc()
+{
+    QString cod;
+    cod.push_back("DIRECTION 1,0\n");
+    cod.push_back("CLS\n");
+    cod.push_back("SIZE 80 mm,101.6 mm\n");
+    cod.push_back("GAP 4 mm\n");
+    cod.push_back("CODEPAGE 1251\n");
+    cod.push_back("DENSITY 15\n");
+    cod.push_back("PUTBMP 170,110, \"logo.BMP\",1,100\n");
+    cod.push_back(QString::fromUtf8("TEXT 50,350,\"0\",0,12,12,\"Марка - %1\"\n").arg(ui->lineEditMark->text()));
+    cod.push_back(QString::fromUtf8("TEXT 50,390,\"0\",0,12,12,\"Диаметр, мм - %1\"\n").arg(QLocale().toString(ui->lineEditDiam->text().toDouble(),'f',1)));
+    cod.push_back(QString::fromUtf8("TEXT 50,430,\"0\",0,12,12,\"Плавка - %1\"\n").arg(ui->lineEditPlav->text()));
+    cod.push_back(QString::fromUtf8("TEXT 50,470,\"0\",0,12,12,\"Партия - %1\"\n").arg(ui->lineEditPart->text()));
+    cod.push_back(QString::fromUtf8("TEXT 50,510,\"0\",0,12,12,\"Носитель - %1\"\n").arg(ui->lineEditSpool->text()));
+    cod.push_back(QString::fromUtf8("TEXT 50,550,\"0\",0,12,12,\"№ - %1%2%3\"\n").arg(ui->dateEditPr->date().toString("yyMMdd")).arg(getNum(ui->comboBoxNam)).arg(getNum(ui->comboBoxVol)));
+    cod.push_back(QString::fromUtf8("TEXT 50,590,\"0\",0,12,12,\"Масса нетто, кг - %1\"\n").arg(ui->lineEditKvo->text()));
+    cod.push_back(QString::fromUtf8("TEXT 50,630,\"0\",0,12,12,\"Дата изг. - %1\"\n").arg(ui->dateEdit->date().toString("dd.MM.yyyy")));
+    if (ui->checkBoxEan->isChecked() && !ui->lineEditEanEd->text().isEmpty()){
+        cod.push_back(QString("BARCODE 600,350, \"EAN13\",140,2,90,3,3,\"%1\"\n").arg(ui->lineEditEanEd->text().left(12)));
+    }
+    cod.push_back(QString("PRINT %1\n").arg(ui->spinBox->value()));
+    return cod;
+}
+
+QString MainWindow::getCodPack()
+{
+    QString cod;
+    cod.push_back("DIRECTION 1,0\n");
+    cod.push_back("CLS\n");
+    cod.push_back("SIZE 95 mm,110 mm\n");
+    cod.push_back("GAP 4 mm\n");
+    cod.push_back("CODEPAGE 1251\n");
+    cod.push_back("DENSITY 15\n");
+    cod.push_back("PUTBMP 50,110, \"logo.BMP\",1,100\n");
+    cod.push_back(QString::fromUtf8("TEXT 50,260,\"0\",0,12,12,\"Проволока сварочная\"\n"));
+    cod.push_back(QString::fromUtf8("TEXT 350,255,\"0\",0,14,14,\"%1\"\n").arg(ui->lineEditMark->text()));
+    cod.push_back(QString::fromUtf8("TEXT 50,300,\"0\",0,12,12,\"%1\"\n").arg(strGost()));
+    cod.push_back(QString::fromUtf8("BLOCK 50,340,690,120,\"0\",0,10,10,0,0,1,\"%1\"\n").arg(ui->plainTextEdit->toPlainText()));
+    cod.push_back(QString::fromUtf8("TEXT 50,460,\"0\",0,12,12,\"Диаметр, мм - %1\"\n").arg(QLocale().toString(ui->lineEditDiam->text().toDouble(),'f',1)));
+    cod.push_back(QString::fromUtf8("TEXT 50,500,\"0\",0,12,12,\"Плавка - %1\"\n").arg(ui->lineEditPlav->text()));
+    cod.push_back(QString::fromUtf8("TEXT 50,540,\"0\",0,12,12,\"Партия № %1\"\n").arg(ui->lineEditPart->text()));
+    cod.push_back(QString::fromUtf8("TEXT 50,580,\"0\",0,12,12,\"Тип намотки - %1\"\n").arg(ui->lineEditSpool->text()));
+    cod.push_back(QString::fromUtf8("TEXT 350,460,\"0\",0,12,12,\"Дата изг. - %1\"\n").arg(ui->dateEdit->date().toString("dd.MM.yyyy")));
+    cod.push_back(QString::fromUtf8("TEXT 350,500,\"0\",0,12,12,\"Масса нетто, кг - %1\"\n").arg(ui->lineEditKvo->text()));
+    cod.push_back(QString::fromUtf8("TEXT 350,540,\"0\",0,12,12,\"Упаковщик № %1\"\n").arg(ui->lineEditUpk->text()));
+    cod.push_back(QString::fromUtf8("BLOCK 50,620,690,200,\"0\",0,10,10,0,0,1,\"%1\"\n").arg(getSert()));
+    if (ui->checkBoxEan->isChecked() && !getEanPack().isEmpty()){
+        cod.push_back(QString("BARCODE 370,110, \"EAN13\",100,2,0,3,3,\"%1\"\n").arg(getEanPack()));
+    }
+    cod.push_back(QString("PRINT %1\n").arg(ui->spinBox->value()));
+    return cod;
+}
+
+QString MainWindow::getNum(QComboBox *c)
+{
+    int n=0;
+    if (c->findText(c->currentText())!=-1 && c->model()->columnCount()>2){
+        n=c->model()->data(c->model()->index(c->currentIndex(),2),Qt::EditRole).toInt();
+    }
+    return QString("%1").arg((n),2,'d',0,QChar('0'));
+}
+
+QString MainWindow::strGost()
+{
+    QString s;
+    for (int i=0; i<modelTu->rowCount(); i++){
+        if (!s.isEmpty()){
+            s+=", ";
+        }
+        s+=modelTu->data(modelTu->index(i,0),Qt::EditRole).toString();
+    }
+    return s;
+}
+
+QString MainWindow::getSert()
+{
+    QString srtStr;
+    QMultiMap <int, QString> srt;
+    for (int i=0; i<modelOdobr->rowCount(); i++){
+        int id_doc_t=modelOdobr->data(modelOdobr->index(i,0),Qt::EditRole).toInt();
+        QString ved=modelOdobr->data(modelOdobr->index(i,1),Qt::EditRole).toString();
+        QString grade=modelOdobr->data(modelOdobr->index(i,2),Qt::EditRole).toString();
+
+        QString s=ved;
+        if (!grade.isEmpty()){
+            s+=QString::fromUtf8(" категория ")+grade;
+        }
+
+        if (srt.contains(id_doc_t, ved) && (ved!=s)){
+            srt.remove(id_doc_t,ved);
+        }
+
+        QStringList list(srt.values(id_doc_t));
+
+        if (list.indexOf(QRegExp(QString("^"+s+".*")))==-1){
+            srt.insert(id_doc_t,s);
+        }
+    }
+
+    QList<int> keys = srt.uniqueKeys();
+
+    for (int i=0; i<keys.size(); ++i){
+        if (!srtStr.isEmpty()){
+            srtStr+="\n";
+        }
+        srtStr+=docType.value(keys.at(i))+":";
+        QList<QString> v = srt.values(keys.at(i));
+        qSort(v.begin(),v.end());
+        for (QString st:v){
+            if (!srtStr.isEmpty()){
+                srtStr+="\n";
+            }
+            srtStr+=st;
+        }
+    }
+    return srtStr;
+}
+
+QString MainWindow::getEanPack()
+{
+    QString ean;
+    if (!ui->lineEditEanGr->text().isEmpty()){
+        ean=ui->lineEditEanGr->text().left(12);
+    } else if (!ui->lineEditEanEd->text().isEmpty()){
+        ean=ui->lineEditEanEd->text().left(12);
+    }
+    return ean;
+}
+
+void MainWindow::loadSettings()
+{
+    QSettings settings("szsm", QApplication::applicationName());
+    ipAdr=settings.value("ip","192.168.1.118").toString();
+    port=settings.value("port",9100).toInt();
+}
+
+void MainWindow::saveSettings()
+{
+    QSettings settings("szsm", QApplication::applicationName());
+    settings.setValue("ip",ipAdr);
+    settings.setValue("port",port);
 }
 
 void MainWindow::updPart()
@@ -169,14 +321,54 @@ void MainWindow::refreshData(QModelIndex index)
         modelOdobr->setHeaderData(1,Qt::Horizontal,QString::fromUtf8("Ведомство"));
         modelOdobr->setHeaderData(2,Qt::Horizontal,QString::fromUtf8("Категория"));
     }
+    ui->spinBox->setValue(1);
 }
 
 void MainWindow::createSrcLabel()
 {
-
+    printData(getCodSrc());
 }
 
 void MainWindow::createPackLabel()
 {
+    printData(getCodPack());
+}
 
+void MainWindow::refreshDocType()
+{
+    docType.clear();
+    QSqlQuery query;
+    query.prepare("select id, nam from zvd_doc_type order by nam");
+    bool ok=query.exec();
+    if (ok){
+        while(query.next()){
+            docType.insert(query.value(0).toInt(),query.value(1).toString());
+        }
+    } else {
+        QMessageBox::critical(this,QString::fromUtf8("Ошибка"),query.lastError().text(),QMessageBox::Ok);
+    }
+}
+
+void MainWindow::settings()
+{
+    DialogSettings d(ipAdr,port);
+    connect(&d,SIGNAL(cmdPrint(QString)),this,SLOT(printData(QString)));
+    if (d.exec()==QDialog::Accepted){
+        ipAdr=d.getIp();
+        port=d.getPort();
+    }
+}
+
+void MainWindow::viewCmdSrc()
+{
+    DialogCmd c(getCodSrc());
+    connect(&c,SIGNAL(cmdPrint(QString)),this,SLOT(printData(QString)));
+    c.exec();
+}
+
+void MainWindow::viewCmdPack()
+{
+    DialogCmd c(getCodPack());
+    connect(&c,SIGNAL(cmdPrint(QString)),this,SLOT(printData(QString)));
+    c.exec();
 }

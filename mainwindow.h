@@ -6,7 +6,12 @@
 #include <QDataWidgetMapper>
 #include <QTcpSocket>
 #include <QTextCodec>
+#include <QComboBox>
+#include <QSettings>
+#include <QMap>
+#include "dialogsettings.h"
 #include "modelro.h"
+#include "dialogcmd.h"
 
 namespace Ui {
 class MainWindow;
@@ -28,13 +33,28 @@ private:
     ModelRo *modelNam;
     ModelRo *modelOdobr;
     QDataWidgetMapper *mapper;
-    bool printData(const QString &data);
+    QString getCodSrc();
+    QString getCodPack();
+    QString getNum(QComboBox *c);
+    QString strGost();
+    QString getSert();
+    QMap <int, QString> docType;
+    QString getEanPack();
+    QString ipAdr;
+    int port;
+    void loadSettings();
+    void saveSettings();
 
 private slots:
     void updPart();
     void refreshData(QModelIndex index);
     void createSrcLabel();
     void createPackLabel();
+    void refreshDocType();
+    void settings();
+    void viewCmdSrc();
+    void viewCmdPack();
+    bool printData(const QString &data);
 };
 
 #endif // MAINWINDOW_H

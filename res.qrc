@@ -3,7 +3,7 @@
         <file>images/simb_labl.png</file>
         <file>images/simb.png</file>
         <file>images/site.png</file>
-        <file>images/wire.png</file>
         <file>images/icon.ico</file>
+        <file>images/logo.BMP</file>
     </qresource>
 </RCC>

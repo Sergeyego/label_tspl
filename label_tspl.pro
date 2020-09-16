@@ -29,16 +29,22 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     pgdialog.cpp \
-    modelro.cpp
+    modelro.cpp \
+    dialogsettings.cpp \
+    dialogcmd.cpp
 
 HEADERS += \
         mainwindow.h \
     pgdialog.h \
-    modelro.h
+    modelro.h \
+    dialogsettings.h \
+    dialogcmd.h
 
 FORMS += \
         mainwindow.ui \
-    pgdialog.ui
+    pgdialog.ui \
+    dialogsettings.ui \
+    dialogcmd.ui
 
 RESOURCES += \
     res.qrc

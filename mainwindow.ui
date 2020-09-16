@@ -170,6 +170,9 @@
             <property name="text">
              <string>Штрих код</string>
             </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item row="2" column="0" colspan="2">
@@ -379,14 +382,16 @@
     <addaction name="actionPack"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menu_2">
+   <widget class="QMenu" name="menu_3">
     <property name="title">
-     <string>Настройки</string>
+     <string>Команды принтеру</string>
     </property>
     <addaction name="actionPrintCfg"/>
+    <addaction name="actionViewSrc"/>
+    <addaction name="actionViewPack"/>
    </widget>
    <addaction name="menu"/>
-   <addaction name="menu_2"/>
+   <addaction name="menu_3"/>
   </widget>
   <action name="actionSrc">
    <property name="text">
@@ -405,7 +410,7 @@
   </action>
   <action name="actionPrintCfg">
    <property name="text">
-    <string>Принтер</string>
+    <string>Настроить принтер</string>
    </property>
   </action>
   <action name="actionPart">
@@ -414,6 +419,16 @@
    </property>
    <property name="shortcut">
     <string>F5</string>
+   </property>
+  </action>
+  <action name="actionViewSrc">
+   <property name="text">
+    <string>Этикетка носитель</string>
+   </property>
+  </action>
+  <action name="actionViewPack">
+   <property name="text">
+    <string>Этикетка упаковка</string>
    </property>
   </action>
  </widget>
