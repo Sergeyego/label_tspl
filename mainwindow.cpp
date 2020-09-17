@@ -352,7 +352,6 @@ void MainWindow::refreshDocType()
 void MainWindow::settings()
 {
     DialogSettings d(ipAdr,port);
-    connect(&d,SIGNAL(cmdPrint(QString)),this,SLOT(printData(QString)));
     if (d.exec()==QDialog::Accepted){
         ipAdr=d.getIp();
         port=d.getPort();
