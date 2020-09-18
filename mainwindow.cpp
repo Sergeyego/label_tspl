@@ -7,8 +7,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    printerSrc = new TPrinter(this);
-    printerPack = new TPrinter(this);
+    printerSrc = new TPrinter("src",this);
+    printerPack = new TPrinter("pack",this);
 
     loadSettings();
 

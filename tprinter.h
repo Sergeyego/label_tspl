@@ -12,7 +12,7 @@ class TPrinter : public QObject
 {
     Q_OBJECT
 public:
-    explicit TPrinter(QObject *parent = nullptr);
+    explicit TPrinter(QString name, QObject *parent = nullptr);
     ~TPrinter();
     QByteArray printData(QByteArray &data, int respTime=0);
     QByteArray printDecodeData(QString &data, int respTime=0);
@@ -24,6 +24,7 @@ public:
 private:
     QString host;
     int port;
+    QString pname;
 
 signals:
 

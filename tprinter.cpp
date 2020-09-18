@@ -1,7 +1,8 @@
 #include "tprinter.h"
 
-TPrinter::TPrinter(QObject *parent) : QObject(parent)
+TPrinter::TPrinter(QString name, QObject *parent) : QObject(parent)
 {
+    pname=name;
     loadSettings();
 }
 
@@ -73,13 +74,13 @@ int TPrinter::getPort()
 void TPrinter::loadSettings()
 {
     QSettings settings("szsm", QApplication::applicationName());
-    host=settings.value(this->objectName()+"_ip","192.168.1.118").toString();
-    port=settings.value(this->objectName()+"_port",9100).toInt();
+    host=settings.value(pname+"_ip","192.168.1.118").toString();
+    port=settings.value(pname+"_port",9100).toInt();
 }
 
 void TPrinter::saveSettings()
 {
     QSettings settings("szsm", QApplication::applicationName());
-    settings.setValue(this->objectName()+"_ip",host);
-    settings.setValue(this->objectName()+"_port",port);
+    settings.setValue(pname+"_ip",host);
+    settings.setValue(pname+"_port",port);
 }
