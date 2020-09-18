@@ -15,6 +15,7 @@ public:
     explicit TPrinter(QObject *parent = nullptr);
     ~TPrinter();
     QByteArray printData(QByteArray &data, int respTime=0);
+    QByteArray printDecodeData(QString &data, int respTime=0);
     QString getIp();
     int getPort();
     void loadSettings();
@@ -27,7 +28,6 @@ private:
 signals:
 
 public slots:
-    QByteArray printDecodeData(QString &data, int respTime=0);
     void setHost(QString ip);
     void setPort(int p);
 };

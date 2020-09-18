@@ -354,14 +354,12 @@ void MainWindow::settingsPrintPack()
 
 void MainWindow::viewCmdSrc()
 {
-    DialogCmd c(getCodSrc());
-    connect(&c,SIGNAL(cmdPrint(QString)),printerSrc,SLOT(printDecodeData(QString&,int)));
+    DialogCmd c(getCodSrc(),printerSrc);
     c.exec();
 }
 
 void MainWindow::viewCmdPack()
 {
-    DialogCmd c(getCodPack());
-    connect(&c,SIGNAL(cmdPrint(QString)),printerPack,SLOT(printDecodeData(QString&,int)));
+    DialogCmd c(getCodPack(),printerPack);
     c.exec();
 }

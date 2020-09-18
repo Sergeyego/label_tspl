@@ -63,10 +63,10 @@ void DialogSettings::parceCfg(QString cfg)
 
 void DialogSettings::calibr()
 {
-    QByteArray cmd;
-    cmd.push_back(QString("SIZE %1 mm, %2 mm\n").arg(ui->doubleSpinBoxHeiht->value()).arg(ui->doubleSpinBoxWidth->value()).toLocal8Bit());
-    cmd.push_back(QString("BLINEDETECT %1, %2\n").arg(ui->doubleSpinBoxWidth->value()*8.0).arg(ui->doubleSpinBoxGap->value()*8.0).toLocal8Bit());
-    printer->printData(cmd);
+    QString cmd;
+    cmd+=QString("SIZE %1 mm, %2 mm\n").arg(ui->doubleSpinBoxHeiht->value()).arg(ui->doubleSpinBoxWidth->value());
+    cmd+=QString("BLINEDETECT %1, %2\n").arg(ui->doubleSpinBoxWidth->value()*8.0).arg(ui->doubleSpinBoxGap->value()*8.0);
+    printer->printDecodeData(cmd);
 }
 
 void DialogSettings::download()
@@ -78,9 +78,10 @@ void DialogSettings::download()
         QFileInfo fi(f);
         if (f.open(QIODevice::ReadOnly)){
             qDebug()<<fi.fileName();
-            cmd.append(QString("DOWNLOAD F, \"%1\", %2, ").arg(fi.fileName()).arg(f.size()).toLatin1());
+            QString d=QString("DOWNLOAD F,\"%1\",%2,").arg(fi.fileName()).arg(f.size());
+            cmd.append(d.toLocal8Bit().data());
             cmd.append(f.readAll());
-            cmd.append("\n");
+            //cmd.append("\n");
             printer->printData(cmd);
         }
     }
@@ -89,13 +90,13 @@ void DialogSettings::download()
 
 void DialogSettings::getSettings()
 {
-    QByteArray mes;
-    mes.push_back("OUT \"MODEL=\";GETSETTING$(\"SYSTEM\", \"INFORMATION\", \"MODEL\")\n");
-    mes.push_back("OUT \"BLINE SIZE=\";GETSETTING$(\"CONFIG\", \"TSPL\", \"BLINE SIZE\")\n");
-    mes.push_back("OUT \"PAPER SIZE=\";GETSETTING$(\"CONFIG\", \"TSPL\", \"PAPER SIZE\")\n");
-    mes.push_back("OUT \"PAPER WIDTH=\";GETSETTING$(\"CONFIG\", \"TSPL\", \"PAPER WIDTH\")\n");
-    mes.push_back("OUT \"FILES=\";~!F\n");
-    QString s=printer->printData(mes,100);
+    QString cmd;
+    cmd+=QString("OUT \"MODEL=\";GETSETTING$(\"SYSTEM\", \"INFORMATION\", \"MODEL\")\n");
+    cmd+=QString("OUT \"BLINE SIZE=\";GETSETTING$(\"CONFIG\", \"TSPL\", \"BLINE SIZE\")\n");
+    cmd+=QString("OUT \"PAPER SIZE=\";GETSETTING$(\"CONFIG\", \"TSPL\", \"PAPER SIZE\")\n");
+    cmd+=QString("OUT \"PAPER WIDTH=\";GETSETTING$(\"CONFIG\", \"TSPL\", \"PAPER WIDTH\")\n");
+    cmd+=QString("OUT \"FILES=\";~!F\n");
+    QString s=printer->printDecodeData(cmd,100);
     parceCfg(s);
 }
 

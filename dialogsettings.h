@@ -4,9 +4,7 @@
 #include <QDialog>
 #include <QFile>
 #include <QDebug>
-#include <QTcpSocket>
 #include <QMessageBox>
-#include <QHostAddress>
 #include <QFileDialog>
 #include "tprinter.h"
 

@@ -4,8 +4,6 @@
 #include <QMainWindow>
 #include <QSqlQuery>
 #include <QDataWidgetMapper>
-#include <QTcpSocket>
-#include <QTextCodec>
 #include <QComboBox>
 #include <QSettings>
 #include <QMap>

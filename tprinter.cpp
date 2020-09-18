@@ -14,21 +14,22 @@ QByteArray TPrinter::printData(QByteArray &data, int respTime)
 {
     QTcpSocket tcpSocket;
     QByteArray buf;
+
     tcpSocket.connectToHost(getIp(),getPort());
     bool ok=tcpSocket.waitForConnected();
     if (ok){
         qint64 x = 0;
         const qint64 size=data.size();
-        //int bsize=2048;
+        int bsize=2048;
         while (x < size) {
-            //int b= ((size-x)< bsize) ? (size-x) : bsize;
-            qint64 y = tcpSocket.write(data/*,b*/);
-            qDebug()<<QString::fromUtf8("Отправлено ")<<y<<QString::fromUtf8(" байт");
+            int b= ((size-x)< bsize) ? (size-x) : bsize;
+            qint64 y = tcpSocket.write(data.right(size-x),b);
+            tcpSocket.waitForBytesWritten();
+            qDebug()<<QString::fromUtf8("Отправлено %1 байт").arg(y);
             x += y;
         }
-        tcpSocket.waitForBytesWritten();
         if (respTime>0){
-            while (tcpSocket.waitForReadyRead(100)){
+            while (tcpSocket.waitForReadyRead(respTime)){
                 buf.push_back(tcpSocket.readAll());
             }
             if (buf.isEmpty()){

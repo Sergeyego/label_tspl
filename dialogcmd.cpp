@@ -1,9 +1,10 @@
 #include "dialogcmd.h"
 #include "ui_dialogcmd.h"
 
-DialogCmd::DialogCmd(QString cmd, QWidget *parent) :
+DialogCmd::DialogCmd(QString cmd, TPrinter *p, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::DialogCmd)
+    ui(new Ui::DialogCmd),
+    printer(p)
 {
     ui->setupUi(this);
     ui->plainTextEdit->setPlainText(cmd);
@@ -17,5 +18,6 @@ DialogCmd::~DialogCmd()
 
 void DialogCmd::goCmd()
 {
-    emit cmdPrint(ui->plainTextEdit->toPlainText());
+    QString s=ui->plainTextEdit->toPlainText();
+    printer->printDecodeData(s);
 }
