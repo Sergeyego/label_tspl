@@ -7,6 +7,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    printerSrc = new TPrinter(this);
+    printerPack = new TPrinter(this);
+
     loadSettings();
 
     refreshDocType();
@@ -63,8 +66,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionSrc,SIGNAL(triggered(bool)),this,SLOT(createSrcLabel()));
     connect(ui->actionPack,SIGNAL(triggered(bool)),this,SLOT(createPackLabel()));
     connect(ui->actionExit,SIGNAL(triggered(bool)),this,SLOT(close()));
-    connect(ui->actionPrintCfg,SIGNAL(triggered(bool)),this,SLOT(settings()));
-
+    connect(ui->actionSetPrintSrc,SIGNAL(triggered(bool)),this,SLOT(settingsPrintSrc()));
+    connect(ui->actionSetPrintPack,SIGNAL(triggered(bool)),this,SLOT(settingsPrintPack()));
     connect(ui->actionViewSrc,SIGNAL(triggered(bool)),this,SLOT(viewCmdSrc()));
     connect(ui->actionViewPack,SIGNAL(triggered(bool)),this,SLOT(viewCmdPack()));
 
@@ -77,21 +80,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-bool MainWindow::printData(const QString &data)
-{
-    QTcpSocket tcpSocket;
-    QTextCodec *codec = QTextCodec::codecForName("Windows-1251");
-    tcpSocket.connectToHost(ipAdr,port);
-    bool ok=tcpSocket.waitForConnected(1000);
-    if (ok) {
-        tcpSocket.write(codec->fromUnicode(data));
-        tcpSocket.waitForBytesWritten();
-        tcpSocket.disconnectFromHost();
-    } else {
-        QMessageBox::critical(this,QString::fromUtf8("Ошибка"),tcpSocket.errorString(),QMessageBox::Ok);
-    }
-    return ok;
-}
 
 QString MainWindow::getCodSrc()
 {
@@ -226,15 +214,13 @@ QString MainWindow::getEanPack()
 void MainWindow::loadSettings()
 {
     QSettings settings("szsm", QApplication::applicationName());
-    ipAdr=settings.value("ip","192.168.1.118").toString();
-    port=settings.value("port",9100).toInt();
+    this->restoreGeometry(settings.value("main_geometry").toByteArray());
 }
 
 void MainWindow::saveSettings()
 {
     QSettings settings("szsm", QApplication::applicationName());
-    settings.setValue("ip",ipAdr);
-    settings.setValue("port",port);
+    settings.setValue("main_geometry", this->saveGeometry());
 }
 
 void MainWindow::updPart()
@@ -326,12 +312,14 @@ void MainWindow::refreshData(QModelIndex index)
 
 void MainWindow::createSrcLabel()
 {
-    printData(getCodSrc());
+    QString c=getCodSrc();
+    printerSrc->printDecodeData(c);
 }
 
 void MainWindow::createPackLabel()
 {
-    printData(getCodPack());
+    QString c=getCodPack();
+    printerPack->printDecodeData(c);
 }
 
 void MainWindow::refreshDocType()
@@ -349,25 +337,31 @@ void MainWindow::refreshDocType()
     }
 }
 
-void MainWindow::settings()
+void MainWindow::settingsPrintSrc()
 {
-    DialogSettings d(ipAdr,port);
-    if (d.exec()==QDialog::Accepted){
-        ipAdr=d.getIp();
-        port=d.getPort();
-    }
+    DialogSettings d(printerSrc);
+    d.setSmallLbl();
+    d.exec();
 }
+
+void MainWindow::settingsPrintPack()
+{
+    DialogSettings d(printerPack);
+    d.setBigLbl();
+    d.exec();
+}
+
 
 void MainWindow::viewCmdSrc()
 {
     DialogCmd c(getCodSrc());
-    connect(&c,SIGNAL(cmdPrint(QString)),this,SLOT(printData(QString)));
+    connect(&c,SIGNAL(cmdPrint(QString)),printerSrc,SLOT(printDecodeData(QString&,int)));
     c.exec();
 }
 
 void MainWindow::viewCmdPack()
 {
     DialogCmd c(getCodPack());
-    connect(&c,SIGNAL(cmdPrint(QString)),this,SLOT(printData(QString)));
+    connect(&c,SIGNAL(cmdPrint(QString)),printerPack,SLOT(printDecodeData(QString&,int)));
     c.exec();
 }

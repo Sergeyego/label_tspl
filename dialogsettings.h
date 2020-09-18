@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QHostAddress>
 #include <QFileDialog>
+#include "tprinter.h"
 
 namespace Ui {
 class DialogSettings;
@@ -18,19 +19,21 @@ class DialogSettings : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogSettings(QString ip, int port, QWidget *parent = 0);
+    explicit DialogSettings(TPrinter *p, QWidget *parent = 0);
     ~DialogSettings();
-    QString getIp();
-    int getPort();
+
+public slots:
+    void setBigLbl();
+    void setSmallLbl();
 
 private:
     Ui::DialogSettings *ui;
     void parceCfg(QString cfg);
+    TPrinter *printer;
 
 private slots:
     void calibr();
     void download();
-    void cmdPrint(QByteArray &data, bool waitresp=false);
     void getSettings();
 };
 

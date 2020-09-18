@@ -31,14 +31,16 @@ SOURCES += \
     pgdialog.cpp \
     modelro.cpp \
     dialogsettings.cpp \
-    dialogcmd.cpp
+    dialogcmd.cpp \
+    tprinter.cpp
 
 HEADERS += \
         mainwindow.h \
     pgdialog.h \
     modelro.h \
     dialogsettings.h \
-    dialogcmd.h
+    dialogcmd.h \
+    tprinter.h
 
 FORMS += \
         mainwindow.ui \

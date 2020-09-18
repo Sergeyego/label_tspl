@@ -1,19 +1,25 @@
 #include "dialogsettings.h"
 #include "ui_dialogsettings.h"
 
-DialogSettings::DialogSettings(QString ip, int port, QWidget *parent) :
+DialogSettings::DialogSettings(TPrinter *p, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DialogSettings)
 {
     ui->setupUi(this);
-    ui->lineEditIp->setText(ip);
-    ui->spinBoxPort->setValue(port);
+    printer=p;
+
+    ui->lineEditIp->setText(printer->getIp());
+    ui->spinBoxPort->setValue(printer->getPort());
 
     connect(ui->buttonBox,SIGNAL(accepted()),this,SLOT(accept()));
     connect(ui->buttonBox,SIGNAL(rejected()),this,SLOT(reject()));
     connect(ui->pushButtonCal,SIGNAL(clicked(bool)),this,SLOT(calibr()));
     connect(ui->pushButtonDownload,SIGNAL(clicked(bool)),this,SLOT(download()));
     connect(ui->pushButtonGet,SIGNAL(clicked(bool)),this,SLOT(getSettings()));
+    connect(ui->lineEditIp,SIGNAL(textChanged(QString)),printer,SLOT(setHost(QString)));
+    connect(ui->spinBoxPort,SIGNAL(valueChanged(int)),printer,SLOT(setPort(int)));
+    connect(ui->pushButtonSmall,SIGNAL(clicked(bool)),this,SLOT(setSmallLbl()));
+    connect(ui->pushButtonBig,SIGNAL(clicked(bool)),this,SLOT(setBigLbl()));
 }
 
 DialogSettings::~DialogSettings()
@@ -21,15 +27,6 @@ DialogSettings::~DialogSettings()
     delete ui;
 }
 
-QString DialogSettings::getIp()
-{
-    return ui->lineEditIp->text();
-}
-
-int DialogSettings::getPort()
-{
-    return ui->spinBoxPort->value();
-}
 
 void DialogSettings::parceCfg(QString cfg)
 {
@@ -69,7 +66,7 @@ void DialogSettings::calibr()
     QByteArray cmd;
     cmd.push_back(QString("SIZE %1 mm, %2 mm\n").arg(ui->doubleSpinBoxHeiht->value()).arg(ui->doubleSpinBoxWidth->value()).toLocal8Bit());
     cmd.push_back(QString("BLINEDETECT %1, %2\n").arg(ui->doubleSpinBoxWidth->value()*8.0).arg(ui->doubleSpinBoxGap->value()*8.0).toLocal8Bit());
-    cmdPrint(cmd);
+    printer->printData(cmd);
 }
 
 void DialogSettings::download()
@@ -84,41 +81,8 @@ void DialogSettings::download()
             cmd.append(QString("DOWNLOAD F, \"%1\", %2, ").arg(fi.fileName()).arg(f.size()).toLatin1());
             cmd.append(f.readAll());
             cmd.append("\n");
-            cmdPrint(cmd);
+            printer->printData(cmd);
         }
-    }
-}
-
-void DialogSettings::cmdPrint(QByteArray &data, bool waitresp)
-{
-    QTcpSocket tcpSocket;
-    tcpSocket.connectToHost(getIp(),getPort());
-    bool ok=tcpSocket.waitForConnected();
-    if (ok){
-        qint64 x = 0;
-        const qint64 size=data.size();
-        int bsize=16384;
-        while (x < size) {
-            int b= ((size-x)< bsize) ? (size-x) : bsize;
-            qint64 y = tcpSocket.write(data,b);
-            //tcpSocket.waitForBytesWritten();
-            qDebug()<<QString::fromUtf8("Отправлено ")<<y<<QString::fromUtf8(" байт");
-            x += y;
-        }
-        if (waitresp){
-            QString buf;
-            while (tcpSocket.waitForReadyRead(100)){
-                buf.push_back(tcpSocket.readAll());
-            }
-            if (buf.isEmpty()){
-                QMessageBox::critical(this,QString::fromUtf8("Ошибка"),tcpSocket.errorString(),QMessageBox::Ok);
-            } else {
-                parceCfg(buf);
-            }
-        }
-        tcpSocket.disconnectFromHost();
-    } else {
-        QMessageBox::critical(this,QString::fromUtf8("Ошибка"),tcpSocket.errorString(),QMessageBox::Ok);
     }
 }
 
@@ -131,6 +95,21 @@ void DialogSettings::getSettings()
     mes.push_back("OUT \"PAPER SIZE=\";GETSETTING$(\"CONFIG\", \"TSPL\", \"PAPER SIZE\")\n");
     mes.push_back("OUT \"PAPER WIDTH=\";GETSETTING$(\"CONFIG\", \"TSPL\", \"PAPER WIDTH\")\n");
     mes.push_back("OUT \"FILES=\";~!F\n");
-    cmdPrint(mes,true);
+    QString s=printer->printData(mes,100);
+    parceCfg(s);
+}
+
+void DialogSettings::setBigLbl()
+{
+    ui->doubleSpinBoxGap->setValue(4.0);
+    ui->doubleSpinBoxWidth->setValue(110.0);
+    ui->doubleSpinBoxHeiht->setValue(95.0);
+}
+
+void DialogSettings::setSmallLbl()
+{
+    ui->doubleSpinBoxGap->setValue(4.0);
+    ui->doubleSpinBoxWidth->setValue(101.6);
+    ui->doubleSpinBoxHeiht->setValue(80.0);
 }
 

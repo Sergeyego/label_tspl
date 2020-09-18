@@ -386,12 +386,19 @@
     <property name="title">
      <string>Команды принтеру</string>
     </property>
-    <addaction name="actionPrintCfg"/>
     <addaction name="actionViewSrc"/>
     <addaction name="actionViewPack"/>
    </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Настройки</string>
+    </property>
+    <addaction name="actionSetPrintSrc"/>
+    <addaction name="actionSetPrintPack"/>
+   </widget>
    <addaction name="menu"/>
    <addaction name="menu_3"/>
+   <addaction name="menu_2"/>
   </widget>
   <action name="actionSrc">
    <property name="text">
@@ -429,6 +436,16 @@
   <action name="actionViewPack">
    <property name="text">
     <string>Этикетка упаковка</string>
+   </property>
+  </action>
+  <action name="actionSetPrintSrc">
+   <property name="text">
+    <string>Принтер для носителя</string>
+   </property>
+  </action>
+  <action name="actionSetPrintPack">
+   <property name="text">
+    <string>Принтер для упаковки</string>
    </property>
   </action>
  </widget>

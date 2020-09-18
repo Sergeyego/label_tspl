@@ -12,6 +12,7 @@
 #include "dialogsettings.h"
 #include "modelro.h"
 #include "dialogcmd.h"
+#include "tprinter.h"
 
 namespace Ui {
 class MainWindow;
@@ -40,10 +41,10 @@ private:
     QString getSert();
     QMap <int, QString> docType;
     QString getEanPack();
-    QString ipAdr;
-    int port;
     void loadSettings();
     void saveSettings();
+    TPrinter *printerSrc;
+    TPrinter *printerPack;
 
 private slots:
     void updPart();
@@ -51,10 +52,10 @@ private slots:
     void createSrcLabel();
     void createPackLabel();
     void refreshDocType();
-    void settings();
+    void settingsPrintSrc();
+    void settingsPrintPack();
     void viewCmdSrc();
     void viewCmdPack();
-    bool printData(const QString &data);
 };
 
 #endif // MAINWINDOW_H
