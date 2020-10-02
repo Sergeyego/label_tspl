@@ -32,14 +32,19 @@ MainWindow::MainWindow(QWidget *parent) :
     modelTu = new ModelRo(this);
     ui->listViewGost->setModel(modelTu);
 
-    modelVol = new ModelRo(this);
+    modelOtk = new ModelRo(this);
     modelNam = new ModelRo(this);
 
     modelOdobr = new ModelRo(this);
     ui->tableViewOdobr->setModel(modelOdobr);
 
-    ui->comboBoxVol->setModel(modelVol);
+    ui->comboBoxOtk->setModel(modelOtk);
     ui->comboBoxNam->setModel(modelNam);
+
+    modelPartOrig = new ModelRo(this);
+    ui->comboBoxOPart->setModel(modelPartOrig);
+    ui->comboBoxOPart->completer()->setCompletionMode(QCompleter::PopupCompletion);
+    ui->comboBoxOPart->completer()->setCaseSensitivity(Qt::CaseInsensitive);
 
     modelPart = new ModelRo(this);
     ui->tableViewPart->setModel(modelPart);
@@ -53,7 +58,6 @@ MainWindow::MainWindow(QWidget *parent) :
     mapper->addMapping(ui->lineEditDiam,3);
     mapper->addMapping(ui->lineEditSpool,4);
     mapper->addMapping(ui->dateEdit,6);
-    mapper->addMapping(ui->dateEditPr,6);
     mapper->addMapping(ui->lineEditPlav,7);
     mapper->addMapping(ui->lineEditKvo,8);
     mapper->addMapping(ui->plainTextEdit,9);
@@ -95,8 +99,8 @@ QString MainWindow::getCodSrc()
     cod.push_back(QString::fromUtf8("TEXT 50,390,\"0\",0,12,12,\"Диаметр, мм - %1\"\n").arg(QLocale().toString(ui->lineEditDiam->text().toDouble(),'f',1)));
     cod.push_back(QString::fromUtf8("TEXT 50,430,\"0\",0,12,12,\"Плавка - %1\"\n").arg(ui->lineEditPlav->text()));
     cod.push_back(QString::fromUtf8("TEXT 50,470,\"0\",0,12,12,\"Партия - %1\"\n").arg(ui->lineEditPart->text()));
-    cod.push_back(QString::fromUtf8("TEXT 50,510,\"0\",0,12,12,\"Носитель - %1\"\n").arg(ui->lineEditSpool->text()));
-    cod.push_back(QString::fromUtf8("TEXT 50,550,\"0\",0,12,12,\"№ - %1%2%3\"\n").arg(ui->dateEditPr->date().toString("yyMMdd")).arg(getNum(ui->comboBoxNam)).arg(getNum(ui->comboBoxVol)));
+    cod.push_back(QString::fromUtf8("TEXT 50,510,\"0\",0,12,12,\"Тип носителя - %1\"\n").arg(ui->lineEditSpool->text()));
+    cod.push_back(QString::fromUtf8("TEXT 50,550,\"0\",0,12,12,\"Код продукции - %1\"\n").arg(getCod()));
     cod.push_back(QString::fromUtf8("TEXT 50,590,\"0\",0,12,12,\"Масса нетто, кг - %1\"\n").arg(ui->lineEditKvo->text()));
     cod.push_back(QString::fromUtf8("TEXT 50,630,\"0\",0,12,12,\"Дата изг. - %1\"\n").arg(ui->dateEdit->date().toString("dd.MM.yyyy")));
     if (ui->checkBoxEan->isChecked() && !ui->lineEditEanEd->text().isEmpty()){
@@ -123,7 +127,7 @@ QString MainWindow::getCodPack()
     cod.push_back(QString::fromUtf8("TEXT 50,460,\"0\",0,12,12,\"Диаметр, мм - %1\"\n").arg(QLocale().toString(ui->lineEditDiam->text().toDouble(),'f',1)));
     cod.push_back(QString::fromUtf8("TEXT 50,500,\"0\",0,12,12,\"Плавка - %1\"\n").arg(ui->lineEditPlav->text()));
     cod.push_back(QString::fromUtf8("TEXT 50,540,\"0\",0,12,12,\"Партия № %1\"\n").arg(ui->lineEditPart->text()));
-    cod.push_back(QString::fromUtf8("TEXT 50,580,\"0\",0,12,12,\"Тип намотки - %1\"\n").arg(ui->lineEditSpool->text()));
+    cod.push_back(QString::fromUtf8("TEXT 50,580,\"0\",0,12,12,\"Тип носителя - %1\"\n").arg(ui->lineEditSpool->text()));
     cod.push_back(QString::fromUtf8("TEXT 350,460,\"0\",0,12,12,\"Дата изг. - %1\"\n").arg(ui->dateEdit->date().toString("dd.MM.yyyy")));
     cod.push_back(QString::fromUtf8("TEXT 350,500,\"0\",0,12,12,\"Масса нетто, кг - %1\"\n").arg(ui->lineEditKvo->text()));
     cod.push_back(QString::fromUtf8("TEXT 350,540,\"0\",0,12,12,\"Упаковщик № %1\"\n").arg(ui->lineEditUpk->text()));
@@ -223,8 +227,48 @@ void MainWindow::saveSettings()
     settings.setValue("main_geometry", this->saveGeometry());
 }
 
+QString MainWindow::getCod()
+{
+    int n=ui->comboBoxOPart->currentIndex();
+    QString npart=ui->comboBoxOPart->model()->data(ui->comboBoxOPart->model()->index(n,2),Qt::EditRole).toString();
+    QString year=ui->comboBoxOPart->model()->data(ui->comboBoxOPart->model()->index(n,3),Qt::EditRole).toDate().toString("yy");
+    year=year.rightJustified(2,QChar('0'));
+    npart=npart.rightJustified(4,QChar('0'));
+    return year+npart+getNum(ui->comboBoxNam);
+}
+
 void MainWindow::updPart()
 {
+    QSqlQuery queryOtk;
+    queryOtk.prepare("select o.id, o.nam ||' ('||o.num||')', o.num from otk as o where o.num<>0 order by o.nam");
+    if (modelOtk->execQuery(queryOtk)){
+        ui->comboBoxOtk->setModelColumn(1);
+    }
+
+    QSqlQuery queryNam;
+    queryNam.prepare("select r.id, r.first_name||' '||substr(r.last_name,1,1)||'. '||substr(r.middle_name,1,1)||'. '||'('||n.num||')' as rab, n.num "
+                     "from wire_namoch as n "
+                     "inner join wire_empl as r on n.id_rab = r.id "
+                     "where r.id <> 0 and n.id_pr = 3 "
+                     "order by rab");
+    if (modelNam->execQuery(queryNam)){
+        ui->comboBoxNam->setModelColumn(1);
+    }
+
+    QSqlQuery queryOPart;
+    queryOPart.prepare("select p.id, m.n_s ||'-'||date_part('year',m.dat) ||' '||pr.nam ||' '|| d.sdim || ' '|| k.short  as part, m.n_s, m.dat "
+                       "from wire_parti as p "
+                       "inner join wire_parti_m as m on p.id_m=m.id "
+                       "inner join provol as pr on pr.id=m.id_provol "
+                       "inner join diam as d on d.id=m.id_diam "
+                       "inner join wire_pack_kind as k on k.id=p.id_pack "
+                       "where m.dat>= :dat "
+                       "order by part desc");
+    queryOPart.bindValue(":dat",QDate::currentDate().addYears(-2));
+    if (modelPartOrig->execQuery(queryOPart)){
+        ui->comboBoxOPart->setModelColumn(1);
+    }
+
     QSqlQuery query;
     query.prepare("select p.id, m.n_s, w.nam, d.diam, k.short, i.nam, m.dat, b.n_plav, wp.mas_ed, w.description, we.ean_ed, we.ean_group "
                   "from wire_parti as p "
@@ -256,35 +300,15 @@ void MainWindow::updPart()
             ui->tableViewPart->selectRow(modelPart->rowCount()-1);
         }
     }
-
-    QSqlQuery queryVol;
-    queryVol.prepare("select r.id, r.first_name||' '||substr(r.last_name,1,1)||'. '||substr(r.middle_name,1,1)||'. '||'('||n.num||')' as rab, n.num "
-                     "from wire_namoch as n "
-                     "inner join wire_empl as r on n.id_rab = r.id "
-                     "where r.id <> 0 and n.id_pr = 2 "
-                     "order by rab");
-    if (modelVol->execQuery(queryVol)){
-        ui->comboBoxVol->setModelColumn(1);
-    }
-
-    QSqlQuery queryNam;
-    queryNam.prepare("select r.id, r.first_name||' '||substr(r.last_name,1,1)||'. '||substr(r.middle_name,1,1)||'. '||'('||n.num||')' as rab, n.num "
-                     "from wire_namoch as n "
-                     "inner join wire_empl as r on n.id_rab = r.id "
-                     "where r.id <> 0 and n.id_pr = 3 "
-                     "order by rab");
-    if (modelNam->execQuery(queryNam)){
-        ui->comboBoxNam->setModelColumn(1);
-    }
 }
 
 void MainWindow::refreshData(QModelIndex index)
 {
     int id_part=ui->tableViewPart->model()->data(ui->tableViewPart->model()->index(index.row(),0),Qt::EditRole).toInt();
     QSqlQuery tuQuery;
-    tuQuery.prepare("select g.nam from wire_gost as w "
+    tuQuery.prepare("select g.nam from wire_parti_gost as w "
                     "inner join gost_new as g on w.id_gost=g.id "
-                    "where w.id_provol=(select m.id_provol from wire_parti as p inner join wire_parti_m as m on p.id_m=m.id where p.id=:id) order by g.nam");
+                    "where w.id_parti = (select p.id_m from wire_parti as p where p.id = :id) order by g.nam");
     tuQuery.bindValue(":id",id_part);
     if (modelTu->execQuery(tuQuery)){
         ui->listViewGost->setModelColumn(1);
@@ -307,6 +331,15 @@ void MainWindow::refreshData(QModelIndex index)
         modelOdobr->setHeaderData(1,Qt::Horizontal,QString::fromUtf8("Ведомство"));
         modelOdobr->setHeaderData(2,Qt::Horizontal,QString::fromUtf8("Категория"));
     }
+
+    for (int i=0; i<ui->comboBoxOPart->model()->rowCount(); i++){
+        QModelIndex ind=ui->comboBoxOPart->model()->index(i,0);
+        if (ui->comboBoxOPart->model()->data(ind,Qt::EditRole).toInt()==id_part){
+            ui->comboBoxOPart->setCurrentIndex(i);
+            break;
+        }
+    }
+
     ui->spinBox->setValue(1);
 }
 

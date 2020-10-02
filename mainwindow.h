@@ -7,6 +7,7 @@
 #include <QComboBox>
 #include <QSettings>
 #include <QMap>
+#include <QCompleter>
 #include "dialogsettings.h"
 #include "modelro.h"
 #include "dialogcmd.h"
@@ -28,9 +29,10 @@ private:
     Ui::MainWindow *ui;
     ModelRo *modelPart;
     ModelRo *modelTu;
-    ModelRo *modelVol;
+    ModelRo *modelOtk;
     ModelRo *modelNam;
     ModelRo *modelOdobr;
+    ModelRo *modelPartOrig;
     QDataWidgetMapper *mapper;
     QString getCodSrc();
     QString getCodPack();
@@ -43,6 +45,7 @@ private:
     void saveSettings();
     TPrinter *printerSrc;
     TPrinter *printerPack;
+    QString getCod();
 
 private slots:
     void updPart();
