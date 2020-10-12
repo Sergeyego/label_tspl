@@ -34,8 +34,9 @@ private:
     ModelRo *modelOdobr;
     ModelRo *modelPartOrig;
     QDataWidgetMapper *mapper;
-    QString getCodSrc();
-    QString getCodPack();
+    QString getCodSrc(int dpi);
+    QString getCodPack(int dpi);
+    QString getCodPBig(int dpi);
     QString getNum(QComboBox *c);
     QString strGost();
     QString getSert();
@@ -45,18 +46,23 @@ private:
     void saveSettings();
     TPrinter *printerSrc;
     TPrinter *printerPack;
+    TPrinter *printerPBig;
     QString getCod();
+    int getDots(double mm, int dpi);
 
 private slots:
     void updPart();
     void refreshData(QModelIndex index);
     void createSrcLabel();
     void createPackLabel();
+    void createPBigLabel();
     void refreshDocType();
     void settingsPrintSrc();
     void settingsPrintPack();
+    void settingsPrintPBig();
     void viewCmdSrc();
     void viewCmdPack();
+    void viewCmdPBig();
 };
 
 #endif // MAINWINDOW_H

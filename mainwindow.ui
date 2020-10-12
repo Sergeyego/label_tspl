@@ -102,6 +102,27 @@
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <layout class="QGridLayout" name="gridLayout">
+          <item row="13" column="2" colspan="2">
+           <widget class="QTableView" name="tableViewOdobr">
+            <attribute name="verticalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
+           </widget>
+          </item>
+          <item row="10" column="0" colspan="2">
+           <widget class="QLabel" name="label_18">
+            <property name="text">
+             <string>ОТК</string>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="2" colspan="2">
+           <widget class="QComboBox" name="comboBoxOtk">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
           <item row="3" column="0" colspan="2">
            <widget class="QLabel" name="label_6">
             <property name="text">
@@ -182,6 +203,41 @@
             </property>
            </widget>
           </item>
+          <item row="4" column="2" colspan="2">
+           <widget class="QLineEdit" name="lineEditSpool">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2" colspan="2">
+           <widget class="QLineEdit" name="lineEditPart">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2" colspan="2">
+           <widget class="QLineEdit" name="lineEditPlav">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2" colspan="2">
+           <widget class="QLineEdit" name="lineEditDiam">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" colspan="2">
+           <widget class="QLineEdit" name="lineEditMark">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
           <item row="4" column="0" colspan="2">
            <widget class="QLabel" name="label_7">
             <property name="text">
@@ -257,59 +313,23 @@
           <item row="5" column="2" colspan="2">
            <widget class="QLineEdit" name="lineEditKvo"/>
           </item>
-          <item row="4" column="2" colspan="2">
-           <widget class="QLineEdit" name="lineEditSpool">
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2" colspan="2">
-           <widget class="QLineEdit" name="lineEditPart">
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2" colspan="2">
-           <widget class="QLineEdit" name="lineEditPlav">
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2" colspan="2">
-           <widget class="QLineEdit" name="lineEditDiam">
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2" colspan="2">
-           <widget class="QLineEdit" name="lineEditMark">
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="13" column="2" colspan="2">
-           <widget class="QTableView" name="tableViewOdobr">
-            <attribute name="verticalHeaderVisible">
-             <bool>false</bool>
-            </attribute>
-           </widget>
-          </item>
-          <item row="10" column="0" colspan="2">
-           <widget class="QLabel" name="label_18">
+          <item row="15" column="0" colspan="2">
+           <widget class="QLabel" name="label_17">
             <property name="text">
-             <string>ОТК</string>
+             <string>Количество</string>
             </property>
            </widget>
           </item>
-          <item row="10" column="2" colspan="2">
-           <widget class="QComboBox" name="comboBoxOtk">
-            <property name="editable">
-             <bool>true</bool>
+          <item row="15" column="2">
+           <widget class="QSpinBox" name="spinBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimum">
+             <number>1</number>
             </property>
            </widget>
           </item>
@@ -318,16 +338,32 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QLabel" name="label_17">
+           <widget class="QToolButton" name="toolButtonSrc">
             <property name="text">
-             <string>Количество</string>
+             <string>Этикетка носитель</string>
+            </property>
+            <property name="toolButtonStyle">
+             <enum>Qt::ToolButtonTextBesideIcon</enum>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="spinBox">
-            <property name="minimum">
-             <number>1</number>
+           <widget class="QToolButton" name="toolButtonPack">
+            <property name="text">
+             <string>Этикатка 110*95 (пластик)</string>
+            </property>
+            <property name="toolButtonStyle">
+             <enum>Qt::ToolButtonTextBesideIcon</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="toolButtonPBig">
+            <property name="text">
+             <string>Этикетка 100*100</string>
+            </property>
+            <property name="toolButtonStyle">
+             <enum>Qt::ToolButtonTextBesideIcon</enum>
             </property>
            </widget>
           </item>
@@ -343,26 +379,6 @@
              </size>
             </property>
            </spacer>
-          </item>
-          <item>
-           <widget class="QToolButton" name="toolButtonSrc">
-            <property name="text">
-             <string>Этикетка носитель</string>
-            </property>
-            <property name="toolButtonStyle">
-             <enum>Qt::ToolButtonTextBesideIcon</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="toolButtonPack">
-            <property name="text">
-             <string>Этикатка упаковка</string>
-            </property>
-            <property name="toolButtonStyle">
-             <enum>Qt::ToolButtonTextBesideIcon</enum>
-            </property>
-           </widget>
           </item>
          </layout>
         </item>
@@ -388,6 +404,7 @@
     <addaction name="actionPart"/>
     <addaction name="actionSrc"/>
     <addaction name="actionPack"/>
+    <addaction name="actionPBig"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menu_3">
@@ -396,6 +413,7 @@
     </property>
     <addaction name="actionViewSrc"/>
     <addaction name="actionViewPack"/>
+    <addaction name="actionViewPBig"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -403,6 +421,7 @@
     </property>
     <addaction name="actionSetPrintSrc"/>
     <addaction name="actionSetPrintPack"/>
+    <addaction name="actionSetPrintPBig"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_3"/>
@@ -415,7 +434,7 @@
   </action>
   <action name="actionPack">
    <property name="text">
-    <string>Этикетка упаковка</string>
+    <string>Этикетка 110*95 (пластик)</string>
    </property>
   </action>
   <action name="actionExit">
@@ -453,7 +472,22 @@
   </action>
   <action name="actionSetPrintPack">
    <property name="text">
-    <string>Принтер для упаковки</string>
+    <string>Принтер для этик. 110*95 (пластик)</string>
+   </property>
+  </action>
+  <action name="actionSetPrintPBig">
+   <property name="text">
+    <string>Принтер для этик. 100*100</string>
+   </property>
+  </action>
+  <action name="actionPBig">
+   <property name="text">
+    <string>Этикетка 100*100</string>
+   </property>
+  </action>
+  <action name="actionViewPBig">
+   <property name="text">
+    <string>Этикетка 100*100</string>
    </property>
   </action>
  </widget>

@@ -10,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
     printerSrc = new TPrinter("src",this);
     printerPack = new TPrinter("pack",this);
 
+    printerPBig = new TPrinter("pbig",this);
+
     loadSettings();
 
     refreshDocType();
@@ -23,11 +25,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionPart->setIcon(this->style()->standardIcon(QStyle::SP_BrowserReload));
     ui->actionSrc->setIcon(QIcon::fromTheme("document-print"));
     ui->actionPack->setIcon(QIcon::fromTheme("document-print"));
+    ui->actionPBig->setIcon(QIcon::fromTheme("document-print"));
     ui->actionExit->setIcon(this->style()->standardIcon(QStyle::SP_DialogCancelButton));
 
     ui->toolButtonSrc->setDefaultAction(ui->actionSrc);
     ui->toolButtonPack->setDefaultAction(ui->actionPack);
     ui->toolButtonUpd->setDefaultAction(ui->actionPart);
+    ui->toolButtonPBig->setDefaultAction(ui->actionPBig);
 
     modelTu = new ModelRo(this);
     ui->listViewGost->setModel(modelTu);
@@ -69,11 +73,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionPart,SIGNAL(triggered(bool)),this,SLOT(updPart()));
     connect(ui->actionSrc,SIGNAL(triggered(bool)),this,SLOT(createSrcLabel()));
     connect(ui->actionPack,SIGNAL(triggered(bool)),this,SLOT(createPackLabel()));
+    connect(ui->actionPBig,SIGNAL(triggered(bool)),this,SLOT(createPBigLabel()));
     connect(ui->actionExit,SIGNAL(triggered(bool)),this,SLOT(close()));
     connect(ui->actionSetPrintSrc,SIGNAL(triggered(bool)),this,SLOT(settingsPrintSrc()));
     connect(ui->actionSetPrintPack,SIGNAL(triggered(bool)),this,SLOT(settingsPrintPack()));
+    connect(ui->actionSetPrintPBig,SIGNAL(triggered(bool)),this,SLOT(settingsPrintPBig()));
+
     connect(ui->actionViewSrc,SIGNAL(triggered(bool)),this,SLOT(viewCmdSrc()));
     connect(ui->actionViewPack,SIGNAL(triggered(bool)),this,SLOT(viewCmdPack()));
+    connect(ui->actionViewPBig,SIGNAL(triggered(bool)),this,SLOT(viewCmdPBig()));
 
     updPart();
 }
@@ -85,7 +93,7 @@ MainWindow::~MainWindow()
 }
 
 
-QString MainWindow::getCodSrc()
+QString MainWindow::getCodSrc(int dpi)
 {
     QString cod;
     cod.push_back("DIRECTION 1,0\n");
@@ -95,14 +103,14 @@ QString MainWindow::getCodSrc()
     cod.push_back("CODEPAGE 1251\n");
     cod.push_back("DENSITY 15\n");
     cod.push_back("PUTBMP 170,110, \"logo.BMP\",1,100\n");
-    cod.push_back(QString::fromUtf8("TEXT 50,350,\"0\",0,12,12,\"Марка - %1\"\n").arg(ui->lineEditMark->text()));
-    cod.push_back(QString::fromUtf8("TEXT 50,390,\"0\",0,12,12,\"Диаметр, мм - %1\"\n").arg(QLocale().toString(ui->lineEditDiam->text().toDouble(),'f',1)));
-    cod.push_back(QString::fromUtf8("TEXT 50,430,\"0\",0,12,12,\"Плавка - %1\"\n").arg(ui->lineEditPlav->text()));
-    cod.push_back(QString::fromUtf8("TEXT 50,470,\"0\",0,12,12,\"Партия - %1\"\n").arg(ui->lineEditPart->text()));
-    cod.push_back(QString::fromUtf8("TEXT 50,510,\"0\",0,12,12,\"Тип носителя - %1\"\n").arg(ui->lineEditSpool->text()));
-    cod.push_back(QString::fromUtf8("TEXT 50,550,\"0\",0,12,12,\"Код продукции - %1\"\n").arg(getCod()));
-    cod.push_back(QString::fromUtf8("TEXT 50,590,\"0\",0,12,12,\"Масса нетто, кг - %1\"\n").arg(ui->lineEditKvo->text()));
-    cod.push_back(QString::fromUtf8("TEXT 50,630,\"0\",0,12,12,\"Дата изг. - %1\"\n").arg(ui->dateEdit->date().toString("dd.MM.yyyy")));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Марка - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(43.75,dpi)).arg(ui->lineEditMark->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Диаметр, мм - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(48.75,dpi)).arg(QLocale().toString(ui->lineEditDiam->text().toDouble(),'f',1)));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Плавка - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(53.75,dpi)).arg(ui->lineEditPlav->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Партия - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(58.75,dpi)).arg(ui->lineEditPart->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Тип носителя - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(63.75,dpi)).arg(ui->lineEditSpool->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Код продукции - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(68.75,dpi)).arg(getCod()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Масса нетто, кг - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(73.75,dpi)).arg(ui->lineEditKvo->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Дата изг. - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(78.75,dpi)).arg(ui->dateEdit->date().toString("dd.MM.yyyy")));
     if (ui->checkBoxEan->isChecked() && !ui->lineEditEanEd->text().isEmpty()){
         cod.push_back(QString("BARCODE 600,350, \"EAN13\",140,2,90,3,3,\"%1\"\n").arg(ui->lineEditEanEd->text().left(12)));
     }
@@ -110,7 +118,7 @@ QString MainWindow::getCodSrc()
     return cod;
 }
 
-QString MainWindow::getCodPack()
+QString MainWindow::getCodPack(int dpi)
 {
     QString cod;
     cod.push_back("DIRECTION 1,0\n");
@@ -119,21 +127,60 @@ QString MainWindow::getCodPack()
     cod.push_back("GAP 4 mm\n");
     cod.push_back("CODEPAGE 1251\n");
     cod.push_back("DENSITY 15\n");
-    cod.push_back("PUTBMP 50,110, \"logo.BMP\",1,100\n");
-    cod.push_back(QString::fromUtf8("TEXT 50,260,\"0\",0,12,12,\"Проволока сварочная\"\n"));
-    cod.push_back(QString::fromUtf8("TEXT 350,255,\"0\",0,14,14,\"%1\"\n").arg(ui->lineEditMark->text()));
-    cod.push_back(QString::fromUtf8("TEXT 50,300,\"0\",0,12,12,\"%1\"\n").arg(strGost()));
-    cod.push_back(QString::fromUtf8("BLOCK 50,340,690,120,\"0\",0,10,10,0,0,1,\"%1\"\n").arg(ui->plainTextEdit->toPlainText()));
-    cod.push_back(QString::fromUtf8("TEXT 50,460,\"0\",0,12,12,\"Диаметр, мм - %1\"\n").arg(QLocale().toString(ui->lineEditDiam->text().toDouble(),'f',1)));
-    cod.push_back(QString::fromUtf8("TEXT 50,500,\"0\",0,12,12,\"Плавка - %1\"\n").arg(ui->lineEditPlav->text()));
-    cod.push_back(QString::fromUtf8("TEXT 50,540,\"0\",0,12,12,\"Партия № %1\"\n").arg(ui->lineEditPart->text()));
-    cod.push_back(QString::fromUtf8("TEXT 50,580,\"0\",0,12,12,\"Тип носителя - %1\"\n").arg(ui->lineEditSpool->text()));
-    cod.push_back(QString::fromUtf8("TEXT 350,460,\"0\",0,12,12,\"Дата изг. - %1\"\n").arg(ui->dateEdit->date().toString("dd.MM.yyyy")));
-    cod.push_back(QString::fromUtf8("TEXT 350,500,\"0\",0,12,12,\"Масса нетто, кг - %1\"\n").arg(ui->lineEditKvo->text()));
-    cod.push_back(QString::fromUtf8("TEXT 350,540,\"0\",0,12,12,\"Упаковщик № %1\"\n").arg(ui->lineEditUpk->text()));
-    cod.push_back(QString::fromUtf8("BLOCK 50,620,690,200,\"0\",0,10,10,0,0,1,\"%1\"\n").arg(getSert()));
+    cod.push_back(QString("PUTBMP %1,%2,\"logo.BMP\",1,100\n").arg(getDots(6.25,dpi)).arg(getDots(13.75,dpi)));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Проволока сварочная\"\n").arg(getDots(6.25,dpi)).arg(getDots(32.5,dpi)));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,14,14,\"%3\"\n").arg(getDots(45,dpi)).arg(getDots(31.875,dpi)).arg(ui->lineEditMark->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"%3\"\n").arg(getDots(6.25,dpi)).arg(getDots(37.5,dpi)).arg(strGost()));
+    cod.push_back(QString::fromUtf8("BLOCK %1,%2,%3,%4,\"0\",0,10,10,0,0,1,\"%5\"\n").arg(getDots(6.25,dpi)).arg(getDots(42.5,dpi)).arg(getDots(86.25,dpi)).arg(getDots(15,dpi)).arg(ui->plainTextEdit->toPlainText()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Диаметр, мм - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(57.5,dpi)).arg(QLocale().toString(ui->lineEditDiam->text().toDouble(),'f',1)));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Плавка - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(62.5,dpi)).arg(ui->lineEditPlav->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Партия № %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(67.5,dpi)).arg(ui->lineEditPart->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Тип носителя - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(72.5,dpi)).arg(ui->lineEditSpool->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Дата изг. - %3\"\n").arg(getDots(45,dpi)).arg(getDots(57.5,dpi)).arg(ui->dateEdit->date().toString("dd.MM.yyyy")));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Масса нетто, кг - %3\"\n").arg(getDots(45,dpi)).arg(getDots(62.5,dpi)).arg(ui->lineEditKvo->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Упаковщик № %3\"\n").arg(getDots(45,dpi)).arg(getDots(67.5,dpi)).arg(ui->lineEditUpk->text()));
+    cod.push_back(QString::fromUtf8("BLOCK %1,%2,%3,%4,\"0\",0,10,10,0,0,1,\"%5\"\n").arg(getDots(6.25,dpi)).arg(getDots(77.5,dpi)).arg(getDots(86.25,dpi)).arg(getDots(25,dpi)).arg(getSert()));
     if (ui->checkBoxEan->isChecked() && !getEanPack().isEmpty()){
-        cod.push_back(QString("BARCODE 370,110, \"EAN13\",100,2,0,3,3,\"%1\"\n").arg(getEanPack()));
+        cod.push_back(QString("BARCODE %1,%2,\"EAN13\",%3,2,0,%4,%5,\"%6\"\n").arg(getDots(46.25,dpi)).arg(getDots(13.75,dpi)).arg(getDots(12.5,dpi)).arg(getDots(0.375,dpi)).arg(getDots(0.375,dpi)).arg(getEanPack()));
+    }
+    if (ui->comboBoxOtk->currentIndex()!=-1){
+        cod.push_back(QString("CIRCLE %1,%2,%3,%4\n").arg(getDots(60,dpi)).arg(getDots(75,dpi)).arg(getDots(11,dpi)).arg(getDots(0.5,dpi)));
+        cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"ОТК\"\n").arg(getDots(62,dpi)).arg(getDots(77,dpi)));
+        cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"%3\"\n").arg(getDots(63.5,dpi)).arg(getDots(81,dpi)).arg(getNum(ui->comboBoxOtk)));
+    }
+    cod.push_back(QString("PRINT %1\n").arg(ui->spinBox->value()));
+    return cod;
+}
+
+QString MainWindow::getCodPBig(int dpi)
+{
+    QString cod;
+    cod.push_back("DIRECTION 1,0\n");
+    cod.push_back("CLS\n");
+    cod.push_back("SIZE 100 mm,100 mm\n");
+    cod.push_back("GAP 2.8 mm\n");
+    cod.push_back("CODEPAGE 1251\n");
+    cod.push_back("DENSITY 15\n");
+    cod.push_back(QString("PUTBMP %1,%2,\"logo.BMP\",1,100\n").arg(getDots(6.25,dpi)).arg(getDots(6.25,dpi)));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Проволока сварочная\"\n").arg(getDots(6.25,dpi)).arg(getDots(25,dpi)));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,14,14,\"%3\"\n").arg(getDots(45,dpi)).arg(getDots(24.375,dpi)).arg(ui->lineEditMark->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"%3\"\n").arg(getDots(6.25,dpi)).arg(getDots(30,dpi)).arg(strGost()));
+    cod.push_back(QString::fromUtf8("BLOCK %1,%2,%3,%4,\"0\",0,10,10,0,0,1,\"%5\"\n").arg(getDots(6.25,dpi)).arg(getDots(35,dpi)).arg(getDots(86.25,dpi)).arg(getDots(15,dpi)).arg(ui->plainTextEdit->toPlainText()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Диаметр, мм - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(50,dpi)).arg(QLocale().toString(ui->lineEditDiam->text().toDouble(),'f',1)));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Плавка - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(55,dpi)).arg(ui->lineEditPlav->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Партия № %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(60,dpi)).arg(ui->lineEditPart->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Тип носителя - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(65,dpi)).arg(ui->lineEditSpool->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Дата изг. - %3\"\n").arg(getDots(45,dpi)).arg(getDots(50,dpi)).arg(ui->dateEdit->date().toString("dd.MM.yyyy")));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Масса нетто, кг - %3\"\n").arg(getDots(45,dpi)).arg(getDots(55,dpi)).arg(ui->lineEditKvo->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Упаковщик № %3\"\n").arg(getDots(45,dpi)).arg(getDots(60,dpi)).arg(ui->lineEditUpk->text()));
+    cod.push_back(QString::fromUtf8("BLOCK %1,%2,%3,%4,\"0\",0,10,10,0,0,1,\"%5\"\n").arg(getDots(6.25,dpi)).arg(getDots(70,dpi)).arg(getDots(86.25,dpi)).arg(getDots(25,dpi)).arg(getSert()));
+    if (ui->checkBoxEan->isChecked() && !getEanPack().isEmpty()){
+        cod.push_back(QString("BARCODE %1,%2,\"EAN13\",%3,2,0,%4,%5,\"%6\"\n").arg(getDots(46.25,dpi)).arg(getDots(6.25,dpi)).arg(getDots(12.5,dpi)).arg(getDots(0.375,dpi)).arg(getDots(0.375,dpi)).arg(getEanPack()));
+    }
+    if (ui->comboBoxOtk->currentIndex()!=-1){
+        cod.push_back(QString("CIRCLE %1,%2,%3,%4\n").arg(getDots(60,dpi)).arg(getDots(75,dpi)).arg(getDots(11,dpi)).arg(getDots(0.5,dpi)));
+        cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"ОТК\"\n").arg(getDots(62,dpi)).arg(getDots(77,dpi)));
+        cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"%3\"\n").arg(getDots(63.5,dpi)).arg(getDots(81,dpi)).arg(getNum(ui->comboBoxOtk)));
     }
     cod.push_back(QString("PRINT %1\n").arg(ui->spinBox->value()));
     return cod;
@@ -235,6 +282,11 @@ QString MainWindow::getCod()
     year=year.rightJustified(2,QChar('0'));
     npart=npart.rightJustified(4,QChar('0'));
     return year+npart+getNum(ui->comboBoxNam);
+}
+
+int MainWindow::getDots(double mm, int dpi)
+{
+    return dpi*mm/25;
 }
 
 void MainWindow::updPart()
@@ -345,14 +397,20 @@ void MainWindow::refreshData(QModelIndex index)
 
 void MainWindow::createSrcLabel()
 {
-    QString c=getCodSrc();
-    printerSrc->printDecodeData(c);
+    QString c=getCodSrc(printerSrc->getDpi());
+    printerSrc->printDecode(c);
 }
 
 void MainWindow::createPackLabel()
 {
-    QString c=getCodPack();
-    printerPack->printDecodeData(c);
+    QString c=getCodPack(printerPack->getDpi());
+    printerPack->printDecode(c);
+}
+
+void MainWindow::createPBigLabel()
+{
+    QString c=getCodPBig(printerPBig->getDpi());
+    printerPBig->printDecode(c);
 }
 
 void MainWindow::refreshDocType()
@@ -373,26 +431,40 @@ void MainWindow::refreshDocType()
 void MainWindow::settingsPrintSrc()
 {
     DialogSettings d(printerSrc);
-    d.setSmallLbl();
+    d.setLblSize(101.6,80,4);
     d.exec();
 }
 
 void MainWindow::settingsPrintPack()
 {
     DialogSettings d(printerPack);
-    d.setBigLbl();
+    d.setLblSize(110,95,4);
+    d.exec();
+}
+
+void MainWindow::settingsPrintPBig()
+{
+    DialogSettings d(printerPBig);
+    d.setWindowTitle(d.windowTitle()+": "+ui->actionSetPrintPBig->text());
+    d.setLblSize(100,100,2.8);
     d.exec();
 }
 
 
 void MainWindow::viewCmdSrc()
 {
-    DialogCmd c(getCodSrc(),printerSrc);
+    DialogCmd c(getCodSrc(printerSrc->getDpi()),printerSrc);
     c.exec();
 }
 
 void MainWindow::viewCmdPack()
 {
-    DialogCmd c(getCodPack(),printerPack);
+    DialogCmd c(getCodPack(printerPack->getDpi()),printerPack);
+    c.exec();
+}
+
+void MainWindow::viewCmdPBig()
+{
+    DialogCmd c(getCodPBig(printerPBig->getDpi()),printerPBig);
     c.exec();
 }

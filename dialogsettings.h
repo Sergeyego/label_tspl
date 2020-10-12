@@ -19,10 +19,7 @@ class DialogSettings : public QDialog
 public:
     explicit DialogSettings(TPrinter *p, QWidget *parent = 0);
     ~DialogSettings();
-
-public slots:
-    void setBigLbl();
-    void setSmallLbl();
+    void setLblSize(double width, double heiht, double gap);
 
 private:
     Ui::DialogSettings *ui;

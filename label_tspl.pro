@@ -53,3 +53,5 @@ RESOURCES += \
 
 DISTFILES += \
     ico.rc
+
+LIBS += -lcups

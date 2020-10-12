@@ -19,5 +19,5 @@ DialogCmd::~DialogCmd()
 void DialogCmd::goCmd()
 {
     QString s=ui->plainTextEdit->toPlainText();
-    printer->printDecodeData(s);
+    printer->printDecode(s);
 }

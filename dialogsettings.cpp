@@ -8,23 +8,31 @@ DialogSettings::DialogSettings(TPrinter *p, QWidget *parent) :
     ui->setupUi(this);
     printer=p;
 
-    ui->lineEditIp->setText(printer->getIp());
-    ui->spinBoxPort->setValue(printer->getPort());
+    ui->comboBoxPrinters->addItems(printer->getPrinterList());
+    ui->comboBoxPrinters->setCurrentText(printer->getPrinterName());
+
+    ui->spinBoxDpi->setValue(printer->getDpi());
 
     connect(ui->buttonBox,SIGNAL(accepted()),this,SLOT(accept()));
     connect(ui->buttonBox,SIGNAL(rejected()),this,SLOT(reject()));
     connect(ui->pushButtonCal,SIGNAL(clicked(bool)),this,SLOT(calibr()));
     connect(ui->pushButtonDownload,SIGNAL(clicked(bool)),this,SLOT(download()));
-    connect(ui->pushButtonGet,SIGNAL(clicked(bool)),this,SLOT(getSettings()));
-    connect(ui->lineEditIp,SIGNAL(textChanged(QString)),printer,SLOT(setHost(QString)));
-    connect(ui->spinBoxPort,SIGNAL(valueChanged(int)),printer,SLOT(setPort(int)));
-    connect(ui->pushButtonSmall,SIGNAL(clicked(bool)),this,SLOT(setSmallLbl()));
-    connect(ui->pushButtonBig,SIGNAL(clicked(bool)),this,SLOT(setBigLbl()));
+    connect(ui->pushButtonGet,SIGNAL(clicked(bool)),this,SLOT(getSettings()));;
+    connect(ui->spinBoxDpi,SIGNAL(valueChanged(int)),printer,SLOT(setDpi(int)));
+
+    connect(ui->comboBoxPrinters,SIGNAL(currentIndexChanged(QString)),printer,SLOT(setPrinterName(QString)));
 }
 
 DialogSettings::~DialogSettings()
 {
     delete ui;
+}
+
+void DialogSettings::setLblSize(double width, double heiht, double gap)
+{
+    ui->doubleSpinBoxGap->setValue(gap);
+    ui->doubleSpinBoxWidth->setValue(width);
+    ui->doubleSpinBoxHeiht->setValue(heiht);
 }
 
 
@@ -42,15 +50,15 @@ void DialogSettings::parceCfg(QString cfg)
             //qDebug()<<reg.cap(1)<<reg.cap(2);
             if (par==QString("BLINE SIZE")){
                 if (vals.size()){
-                    ui->doubleSpinBoxGap->setValue(vals.at(0).toInt()/8.0);
+                    ui->doubleSpinBoxGap->setValue(vals.at(0).toInt()*printer->getDpi()/25.0);
                 }
             } else if (par==QString("PAPER SIZE")){
                 if (vals.size()){
-                    ui->doubleSpinBoxWidth->setValue(vals.at(0).toInt()/8.0);
+                    ui->doubleSpinBoxWidth->setValue(vals.at(0).toInt()*printer->getDpi()/25.0);
                 }
             } else if (par==QString("PAPER WIDTH")){
                 if (vals.size()){
-                    ui->doubleSpinBoxHeiht->setValue(vals.at(0).toInt()/8.0);
+                    ui->doubleSpinBoxHeiht->setValue(vals.at(0).toInt()*printer->getDpi()/25.0);
                 }
             } else if (par==QString("FILES")){
                 for (int j=0; j<vals.size()-1; j++){
@@ -65,8 +73,8 @@ void DialogSettings::calibr()
 {
     QString cmd;
     cmd+=QString("SIZE %1 mm, %2 mm\n").arg(ui->doubleSpinBoxHeiht->value()).arg(ui->doubleSpinBoxWidth->value());
-    cmd+=QString("BLINEDETECT %1, %2\n").arg(ui->doubleSpinBoxWidth->value()*8.0).arg(ui->doubleSpinBoxGap->value()*8.0);
-    printer->printDecodeData(cmd);
+    cmd+=QString("BLINEDETECT %1, %2\n").arg(int(ui->doubleSpinBoxWidth->value()*printer->getDpi()/25)).arg(int(ui->doubleSpinBoxGap->value()*printer->getDpi()/25));
+    printer->printDecode(cmd);
 }
 
 void DialogSettings::download()
@@ -82,7 +90,7 @@ void DialogSettings::download()
             cmd.append(d.toLocal8Bit().data());
             cmd.append(f.readAll());
             //cmd.append("\n");
-            printer->printData(cmd);
+            printer->print(cmd);
         }
     }
 }
@@ -96,21 +104,7 @@ void DialogSettings::getSettings()
     cmd+=QString("OUT \"PAPER SIZE=\";GETSETTING$(\"CONFIG\", \"TSPL\", \"PAPER SIZE\")\n");
     cmd+=QString("OUT \"PAPER WIDTH=\";GETSETTING$(\"CONFIG\", \"TSPL\", \"PAPER WIDTH\")\n");
     cmd+=QString("OUT \"FILES=\";~!F\n");
-    QString s=printer->printDecodeData(cmd,100);
-    parceCfg(s);
+    //QString s=printer->printDecodeData(cmd,100);
+    //printer->printDecode(cmd);
+    //parceCfg(s);
 }
-
-void DialogSettings::setBigLbl()
-{
-    ui->doubleSpinBoxGap->setValue(4.0);
-    ui->doubleSpinBoxWidth->setValue(110.0);
-    ui->doubleSpinBoxHeiht->setValue(95.0);
-}
-
-void DialogSettings::setSmallLbl()
-{
-    ui->doubleSpinBoxGap->setValue(4.0);
-    ui->doubleSpinBoxWidth->setValue(101.6);
-    ui->doubleSpinBoxHeiht->setValue(80.0);
-}
-
