@@ -182,7 +182,7 @@
           <item row="14" column="0" colspan="2">
            <widget class="QCheckBox" name="checkBoxEan">
             <property name="text">
-             <string>Штрих код</string>
+             <string>Штрих-код</string>
             </property>
             <property name="checked">
              <bool>true</bool>
