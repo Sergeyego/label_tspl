@@ -508,7 +508,7 @@ void MainWindow::settingsPrintPSmall()
 {
     DialogSettings d(printerPSmall);
     d.setWindowTitle(d.windowTitle()+": "+ui->actionSetPrintPSmall->text());
-    d.setLblSize(45,70,2);
+    d.setLblSize(70,45,2);
     d.exec();
 }
 
