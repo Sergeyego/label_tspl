@@ -113,7 +113,7 @@ QString MainWindow::getCodSrc(int dpi)
     cod.push_back("GAP 4 mm\n");
     cod.push_back("CODEPAGE 1251\n");
     cod.push_back("DENSITY 15\n");
-    cod.push_back(QString::fromUtf8("PUTBMP %1,%2, \"logo.BMP\",1,100\n").arg(getDots(21.25,dpi)).arg(getDots(13.75,dpi)));
+    cod.push_back(QString::fromUtf8("PUTBMP %1,%2, \"logo.BMP\",1,100\n").arg(getDots(15,dpi)).arg(getDots(13.75,dpi)));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Марка - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(43.75,dpi)).arg(ui->lineEditMark->text()));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Диаметр, мм - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(48.75,dpi)).arg(QLocale().toString(ui->lineEditDiam->text().toDouble(),'f',1)));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Плавка - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(53.75,dpi)).arg(ui->lineEditPlav->text()));
