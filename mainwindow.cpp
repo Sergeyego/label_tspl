@@ -9,8 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     printerSrc = new TPrinter("src",this);
     printerPack = new TPrinter("pack",this);
-
     printerPBig = new TPrinter("pbig",this);
+    printerPSmall = new TPrinter("psmall",this);
 
     loadSettings();
 
@@ -26,12 +26,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionSrc->setIcon(QIcon::fromTheme("document-print"));
     ui->actionPack->setIcon(QIcon::fromTheme("document-print"));
     ui->actionPBig->setIcon(QIcon::fromTheme("document-print"));
+    ui->actionPSmall->setIcon(QIcon::fromTheme("document-print"));
     ui->actionExit->setIcon(this->style()->standardIcon(QStyle::SP_DialogCancelButton));
 
     ui->toolButtonSrc->setDefaultAction(ui->actionSrc);
     ui->toolButtonPack->setDefaultAction(ui->actionPack);
     ui->toolButtonUpd->setDefaultAction(ui->actionPart);
     ui->toolButtonPBig->setDefaultAction(ui->actionPBig);
+    ui->toolButtonPSmall->setDefaultAction(ui->actionPSmall);
 
     modelTu = new ModelRo(this);
     ui->listViewGost->setModel(modelTu);
@@ -70,18 +72,27 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->tableViewPart->selectionModel(),SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),mapper,SLOT(setCurrentModelIndex(QModelIndex)));
     connect(ui->tableViewPart->selectionModel(),SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),this,SLOT(refreshData(QModelIndex)));
+
     connect(ui->actionPart,SIGNAL(triggered(bool)),this,SLOT(updPart()));
+
     connect(ui->actionSrc,SIGNAL(triggered(bool)),this,SLOT(createSrcLabel()));
     connect(ui->actionPack,SIGNAL(triggered(bool)),this,SLOT(createPackLabel()));
     connect(ui->actionPBig,SIGNAL(triggered(bool)),this,SLOT(createPBigLabel()));
-    connect(ui->actionExit,SIGNAL(triggered(bool)),this,SLOT(close()));
+    connect(ui->actionPSmall,SIGNAL(triggered(bool)),this,SLOT(createPSmallLabel()));
+
     connect(ui->actionSetPrintSrc,SIGNAL(triggered(bool)),this,SLOT(settingsPrintSrc()));
     connect(ui->actionSetPrintPack,SIGNAL(triggered(bool)),this,SLOT(settingsPrintPack()));
     connect(ui->actionSetPrintPBig,SIGNAL(triggered(bool)),this,SLOT(settingsPrintPBig()));
+    connect(ui->actionSetPrintPSmall,SIGNAL(triggered(bool)),this,SLOT(settingsPrintPSmall()));
 
     connect(ui->actionViewSrc,SIGNAL(triggered(bool)),this,SLOT(viewCmdSrc()));
     connect(ui->actionViewPack,SIGNAL(triggered(bool)),this,SLOT(viewCmdPack()));
     connect(ui->actionViewPBig,SIGNAL(triggered(bool)),this,SLOT(viewCmdPBig()));
+    connect(ui->actionViewPSmall,SIGNAL(triggered(bool)),this,SLOT(viewCmdPSmall()));
+
+    connect(ui->comboBoxOPart->lineEdit(),SIGNAL(editingFinished()),this,SLOT(setOrigPart()));
+
+    connect(ui->actionExit,SIGNAL(triggered(bool)),this,SLOT(close()));
 
     updPart();
 }
@@ -102,7 +113,7 @@ QString MainWindow::getCodSrc(int dpi)
     cod.push_back("GAP 4 mm\n");
     cod.push_back("CODEPAGE 1251\n");
     cod.push_back("DENSITY 15\n");
-    cod.push_back("PUTBMP 170,110, \"logo.BMP\",1,100\n");
+    cod.push_back(QString::fromUtf8("PUTBMP %1,%2, \"logo.BMP\",1,100\n").arg(getDots(21.25,dpi)).arg(getDots(13.75,dpi)));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Марка - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(43.75,dpi)).arg(ui->lineEditMark->text()));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Диаметр, мм - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(48.75,dpi)).arg(QLocale().toString(ui->lineEditDiam->text().toDouble(),'f',1)));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Плавка - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(53.75,dpi)).arg(ui->lineEditPlav->text()));
@@ -112,8 +123,9 @@ QString MainWindow::getCodSrc(int dpi)
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Масса нетто, кг - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(73.75,dpi)).arg(ui->lineEditKvo->text()));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Дата изг. - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(78.75,dpi)).arg(ui->dateEdit->date().toString("dd.MM.yyyy")));
     if (ui->checkBoxEan->isChecked() && !ui->lineEditEanEd->text().isEmpty()){
-        cod.push_back(QString("BARCODE 600,350, \"EAN13\",140,2,90,3,3,\"%1\"\n").arg(ui->lineEditEanEd->text().left(12)));
+        cod.push_back(QString("BARCODE %1,%2,\"EAN13\",%3,2,90,%4,%5,\"%6\"\n").arg(getDots(75,dpi)).arg(getDots(43.75,dpi)).arg(getDots(17.5,dpi)).arg(getDots(0.375,dpi)).arg(getDots(0.375,dpi)).arg(ui->lineEditEanEd->text().left(12)));
     }
+    cod.push_back(getOtkStamp(55,20,dpi));
     cod.push_back(QString("PRINT %1\n").arg(ui->spinBox->value()));
     return cod;
 }
@@ -143,11 +155,7 @@ QString MainWindow::getCodPack(int dpi)
     if (ui->checkBoxEan->isChecked() && !getEanPack().isEmpty()){
         cod.push_back(QString("BARCODE %1,%2,\"EAN13\",%3,2,0,%4,%5,\"%6\"\n").arg(getDots(46.25,dpi)).arg(getDots(13.75,dpi)).arg(getDots(12.5,dpi)).arg(getDots(0.375,dpi)).arg(getDots(0.375,dpi)).arg(getEanPack()));
     }
-    if (ui->comboBoxOtk->currentIndex()!=-1){
-        cod.push_back(QString("CIRCLE %1,%2,%3,%4\n").arg(getDots(60,dpi)).arg(getDots(75,dpi)).arg(getDots(11,dpi)).arg(getDots(0.5,dpi)));
-        cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"ОТК\"\n").arg(getDots(62,dpi)).arg(getDots(77,dpi)));
-        cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"%3\"\n").arg(getDots(63.5,dpi)).arg(getDots(81,dpi)).arg(getNum(ui->comboBoxOtk)));
-    }
+    cod.push_back(getOtkStamp(60,75,dpi));
     cod.push_back(QString("PRINT %1\n").arg(ui->spinBox->value()));
     return cod;
 }
@@ -177,11 +185,33 @@ QString MainWindow::getCodPBig(int dpi)
     if (ui->checkBoxEan->isChecked() && !getEanPack().isEmpty()){
         cod.push_back(QString("BARCODE %1,%2,\"EAN13\",%3,2,0,%4,%5,\"%6\"\n").arg(getDots(46.25,dpi)).arg(getDots(6.25,dpi)).arg(getDots(12.5,dpi)).arg(getDots(0.375,dpi)).arg(getDots(0.375,dpi)).arg(getEanPack()));
     }
-    if (ui->comboBoxOtk->currentIndex()!=-1){
-        cod.push_back(QString("CIRCLE %1,%2,%3,%4\n").arg(getDots(60,dpi)).arg(getDots(75,dpi)).arg(getDots(11,dpi)).arg(getDots(0.5,dpi)));
-        cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"ОТК\"\n").arg(getDots(62,dpi)).arg(getDots(77,dpi)));
-        cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"%3\"\n").arg(getDots(63.5,dpi)).arg(getDots(81,dpi)).arg(getNum(ui->comboBoxOtk)));
+    cod.push_back(getOtkStamp(60,75,dpi));
+    cod.push_back(QString("PRINT %1\n").arg(ui->spinBox->value()));
+    return cod;
+}
+
+QString MainWindow::getCodPSmall(int dpi)
+{
+    QString cod;
+    cod.push_back("DIRECTION 1,0\n");
+    cod.push_back("CLS\n");
+    cod.push_back("SIZE 45 mm,70 mm\n");
+    cod.push_back("GAP 2 mm\n");
+    cod.push_back("CODEPAGE 1251\n");
+    cod.push_back("DENSITY 15\n");
+    cod.push_back(QString::fromUtf8("PUTBMP %1,%2, \"logo.BMP\",1,100\n").arg(getDots(2,dpi)).arg(getDots(2,dpi)));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,10,10,\"Марка - %3\"\n").arg(getDots(5,dpi)).arg(getDots(35,dpi)).arg(ui->lineEditMark->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,10,10,\"Диаметр, мм - %3\"\n").arg(getDots(5,dpi)).arg(getDots(39,dpi)).arg(QLocale().toString(ui->lineEditDiam->text().toDouble(),'f',1)));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,10,10,\"Плавка - %3\"\n").arg(getDots(5,dpi)).arg(getDots(43,dpi)).arg(ui->lineEditPlav->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,10,10,\"Партия - %3\"\n").arg(getDots(5,dpi)).arg(getDots(47,dpi)).arg(ui->lineEditPart->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,10,10,\"Тип носителя - %3\"\n").arg(getDots(5,dpi)).arg(getDots(51,dpi)).arg(ui->lineEditSpool->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,10,10,\"Код продукции - %3\"\n").arg(getDots(5,dpi)).arg(getDots(55,dpi)).arg(getCod()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,10,10,\"Масса нетто, кг - %3\"\n").arg(getDots(5,dpi)).arg(getDots(59,dpi)).arg(ui->lineEditKvo->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,10,10,\"Дата изг. - %3\"\n").arg(getDots(5,dpi)).arg(getDots(63,dpi)).arg(ui->dateEdit->date().toString("dd.MM.yyyy")));
+    if (ui->checkBoxEan->isChecked() && !ui->lineEditEanEd->text().isEmpty()){
+        cod.push_back(QString("BARCODE %1,%2,\"EAN13\",%3,2,0,%4,%5,\"%6\"\n").arg(getDots(5,dpi)).arg(getDots(20.5,dpi)).arg(getDots(9,dpi)).arg(getDots(0.375,dpi)).arg(getDots(0.375,dpi)).arg(ui->lineEditEanEd->text().left(12)));
     }
+    cod.push_back(getOtkStamp(31,40,dpi));
     cod.push_back(QString("PRINT %1\n").arg(ui->spinBox->value()));
     return cod;
 }
@@ -289,6 +319,17 @@ int MainWindow::getDots(double mm, int dpi)
     return dpi*mm/25;
 }
 
+QString MainWindow::getOtkStamp(double x, double y, int dpi)
+{
+    QString cod;
+    if (ui->comboBoxOtk->currentIndex()!=-1){
+        cod.push_back(QString("CIRCLE %1,%2,%3,%4\n").arg(getDots(x,dpi)).arg(getDots(y,dpi)).arg(getDots(11,dpi)).arg(getDots(0.5,dpi)));
+        cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"ОТК\"\n").arg(getDots(x+2.0,dpi)).arg(getDots(y+2.0,dpi)));
+        cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"%3\"\n").arg(getDots(x+3.5,dpi)).arg(getDots(y+6.0,dpi)).arg(getNum(ui->comboBoxOtk)));
+    }
+    return cod;
+}
+
 void MainWindow::updPart()
 {
     QSqlQuery queryOtk;
@@ -354,6 +395,11 @@ void MainWindow::updPart()
     }
 }
 
+void MainWindow::setOrigPart()
+{
+    ui->comboBoxOPart->setCurrentIndex(ui->comboBoxOPart->findText(ui->comboBoxOPart->currentText()));
+}
+
 void MainWindow::refreshData(QModelIndex index)
 {
     int id_part=ui->tableViewPart->model()->data(ui->tableViewPart->model()->index(index.row(),0),Qt::EditRole).toInt();
@@ -413,6 +459,12 @@ void MainWindow::createPBigLabel()
     printerPBig->printDecode(c);
 }
 
+void MainWindow::createPSmallLabel()
+{
+    QString c=getCodPSmall(printerPSmall->getDpi());
+    printerPSmall->printDecode(c);
+}
+
 void MainWindow::refreshDocType()
 {
     docType.clear();
@@ -431,6 +483,7 @@ void MainWindow::refreshDocType()
 void MainWindow::settingsPrintSrc()
 {
     DialogSettings d(printerSrc);
+    d.setWindowTitle(d.windowTitle()+": "+ui->actionSetPrintSrc->text());
     d.setLblSize(101.6,80,4);
     d.exec();
 }
@@ -438,6 +491,7 @@ void MainWindow::settingsPrintSrc()
 void MainWindow::settingsPrintPack()
 {
     DialogSettings d(printerPack);
+    d.setWindowTitle(d.windowTitle()+": "+ui->actionSetPrintPack->text());
     d.setLblSize(110,95,4);
     d.exec();
 }
@@ -450,6 +504,13 @@ void MainWindow::settingsPrintPBig()
     d.exec();
 }
 
+void MainWindow::settingsPrintPSmall()
+{
+    DialogSettings d(printerPSmall);
+    d.setWindowTitle(d.windowTitle()+": "+ui->actionSetPrintPSmall->text());
+    d.setLblSize(45,70,2);
+    d.exec();
+}
 
 void MainWindow::viewCmdSrc()
 {
@@ -466,5 +527,11 @@ void MainWindow::viewCmdPack()
 void MainWindow::viewCmdPBig()
 {
     DialogCmd c(getCodPBig(printerPBig->getDpi()),printerPBig);
+    c.exec();
+}
+
+void MainWindow::viewCmdPSmall()
+{
+    DialogCmd c(getCodPSmall(printerPSmall->getDpi()),printerPSmall);
     c.exec();
 }

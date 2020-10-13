@@ -4,6 +4,7 @@
         <file>images/simb.png</file>
         <file>images/site.png</file>
         <file>images/icon.ico</file>
-        <file>images/logo.BMP</file>
+        <file>images/logo200.BMP</file>
+        <file>images/logo300.BMP</file>
     </qresource>
 </RCC>

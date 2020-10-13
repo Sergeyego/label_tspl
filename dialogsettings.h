@@ -23,13 +23,13 @@ public:
 
 private:
     Ui::DialogSettings *ui;
-    void parceCfg(QString cfg);
+    //void parceCfg(QString cfg);
     TPrinter *printer;
 
 private slots:
     void calibr();
-    void download();
-    void getSettings();
+    //void download();
+    //void getSettings();
 };
 
 #endif // DIALOGSETTINGS_H

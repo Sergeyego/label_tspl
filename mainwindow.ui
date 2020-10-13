@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Печать пластиковых этикеток</string>
+   <string>Печать термотрансферных этикеток</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -340,7 +340,7 @@
           <item>
            <widget class="QToolButton" name="toolButtonSrc">
             <property name="text">
-             <string>Этикетка носитель</string>
+             <string>Этикетка 80*101.6 (пластик)</string>
             </property>
             <property name="toolButtonStyle">
              <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -358,6 +358,33 @@
            </widget>
           </item>
           <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QToolButton" name="toolButtonPSmall">
+            <property name="text">
+             <string>Этикетка 45*70</string>
+            </property>
+            <property name="toolButtonStyle">
+             <enum>Qt::ToolButtonTextBesideIcon</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QToolButton" name="toolButtonPBig">
             <property name="text">
              <string>Этикетка 100*100</string>
@@ -368,7 +395,7 @@
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_2">
+           <spacer name="horizontalSpacer_3">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -405,6 +432,7 @@
     <addaction name="actionSrc"/>
     <addaction name="actionPack"/>
     <addaction name="actionPBig"/>
+    <addaction name="actionPSmall"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menu_3">
@@ -414,6 +442,7 @@
     <addaction name="actionViewSrc"/>
     <addaction name="actionViewPack"/>
     <addaction name="actionViewPBig"/>
+    <addaction name="actionViewPSmall"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -422,6 +451,7 @@
     <addaction name="actionSetPrintSrc"/>
     <addaction name="actionSetPrintPack"/>
     <addaction name="actionSetPrintPBig"/>
+    <addaction name="actionSetPrintPSmall"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_3"/>
@@ -429,7 +459,7 @@
   </widget>
   <action name="actionSrc">
    <property name="text">
-    <string>Этикатка носитель</string>
+    <string>Этикатка 80*101.6 (пластик)</string>
    </property>
   </action>
   <action name="actionPack">
@@ -457,17 +487,17 @@
   </action>
   <action name="actionViewSrc">
    <property name="text">
-    <string>Этикетка носитель</string>
+    <string>Этикетка 80*101.6</string>
    </property>
   </action>
   <action name="actionViewPack">
    <property name="text">
-    <string>Этикетка упаковка</string>
+    <string>Этикетка 110*95</string>
    </property>
   </action>
   <action name="actionSetPrintSrc">
    <property name="text">
-    <string>Принтер для носителя</string>
+    <string>Принтер для этик. 80*101.6 (пластик)</string>
    </property>
   </action>
   <action name="actionSetPrintPack">
@@ -488,6 +518,21 @@
   <action name="actionViewPBig">
    <property name="text">
     <string>Этикетка 100*100</string>
+   </property>
+  </action>
+  <action name="actionSetPrintPSmall">
+   <property name="text">
+    <string>Принтер для этик. 45*70</string>
+   </property>
+  </action>
+  <action name="actionViewPSmall">
+   <property name="text">
+    <string>Этикетка 45*70</string>
+   </property>
+  </action>
+  <action name="actionPSmall">
+   <property name="text">
+    <string>Этикетка 45*70</string>
    </property>
   </action>
  </widget>

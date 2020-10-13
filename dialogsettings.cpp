@@ -16,8 +16,6 @@ DialogSettings::DialogSettings(TPrinter *p, QWidget *parent) :
     connect(ui->buttonBox,SIGNAL(accepted()),this,SLOT(accept()));
     connect(ui->buttonBox,SIGNAL(rejected()),this,SLOT(reject()));
     connect(ui->pushButtonCal,SIGNAL(clicked(bool)),this,SLOT(calibr()));
-    connect(ui->pushButtonDownload,SIGNAL(clicked(bool)),this,SLOT(download()));
-    connect(ui->pushButtonGet,SIGNAL(clicked(bool)),this,SLOT(getSettings()));;
     connect(ui->spinBoxDpi,SIGNAL(valueChanged(int)),printer,SLOT(setDpi(int)));
 
     connect(ui->comboBoxPrinters,SIGNAL(currentIndexChanged(QString)),printer,SLOT(setPrinterName(QString)));
@@ -36,7 +34,7 @@ void DialogSettings::setLblSize(double width, double heiht, double gap)
 }
 
 
-void DialogSettings::parceCfg(QString cfg)
+/*void DialogSettings::parceCfg(QString cfg)
 {
     QStringList list=cfg.split("\n");
     ui->listWidgetFiles->clear();
@@ -67,7 +65,7 @@ void DialogSettings::parceCfg(QString cfg)
             }
         }
     }
-}
+}*/
 
 void DialogSettings::calibr()
 {
@@ -77,7 +75,7 @@ void DialogSettings::calibr()
     printer->printDecode(cmd);
 }
 
-void DialogSettings::download()
+/*void DialogSettings::download()
 {
     QString fileName = QFileDialog::getOpenFileName(this,tr("Open file"),QDir::homePath(), tr("bmp Files (*.bmp)"));
     if (!fileName.isEmpty()){
@@ -93,10 +91,10 @@ void DialogSettings::download()
             printer->print(cmd);
         }
     }
-}
+}*/
 
 
-void DialogSettings::getSettings()
+/*void DialogSettings::getSettings()
 {
     QString cmd;
     cmd+=QString("OUT \"MODEL=\";GETSETTING$(\"SYSTEM\", \"INFORMATION\", \"MODEL\")\n");
@@ -107,4 +105,4 @@ void DialogSettings::getSettings()
     //QString s=printer->printDecodeData(cmd,100);
     //printer->printDecode(cmd);
     //parceCfg(s);
-}
+}*/
