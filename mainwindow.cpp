@@ -142,16 +142,17 @@ QString MainWindow::getCodPack(int dpi)
     cod.push_back(QString("PUTBMP %1,%2,\"logo.BMP\",1,100\n").arg(getDots(6.25,dpi)).arg(getDots(13.75,dpi)));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Проволока сварочная\"\n").arg(getDots(6.25,dpi)).arg(getDots(32.5,dpi)));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,14,14,\"%3\"\n").arg(getDots(45,dpi)).arg(getDots(31.875,dpi)).arg(ui->lineEditMark->text()));
-    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"%3\"\n").arg(getDots(6.25,dpi)).arg(getDots(37.5,dpi)).arg(strGost()));
-    cod.push_back(QString::fromUtf8("BLOCK %1,%2,%3,%4,\"0\",0,10,10,0,0,1,\"%5\"\n").arg(getDots(6.25,dpi)).arg(getDots(42.5,dpi)).arg(getDots(86.25,dpi)).arg(getDots(15,dpi)).arg(ui->plainTextEdit->toPlainText()));
-    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Диаметр, мм - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(57.5,dpi)).arg(QLocale().toString(ui->lineEditDiam->text().toDouble(),'f',1)));
-    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Плавка - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(62.5,dpi)).arg(ui->lineEditPlav->text()));
-    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Партия № %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(67.5,dpi)).arg(ui->lineEditPart->text()));
-    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Тип носителя - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(72.5,dpi)).arg(ui->lineEditSpool->text()));
-    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Дата изг. - %3\"\n").arg(getDots(45,dpi)).arg(getDots(57.5,dpi)).arg(ui->dateEdit->date().toString("dd.MM.yyyy")));
-    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Масса нетто, кг - %3\"\n").arg(getDots(45,dpi)).arg(getDots(62.5,dpi)).arg(ui->lineEditKvo->text()));
-    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Упаковщик № %3\"\n").arg(getDots(45,dpi)).arg(getDots(67.5,dpi)).arg(ui->lineEditUpk->text()));
-    cod.push_back(QString::fromUtf8("BLOCK %1,%2,%3,%4,\"0\",0,10,10,0,0,1,\"%5\"\n").arg(getDots(6.25,dpi)).arg(getDots(77.5,dpi)).arg(getDots(86.25,dpi)).arg(getDots(25,dpi)).arg(getSert()));
+    //cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"%3\"\n").arg(getDots(6.25,dpi)).arg(getDots(37.5,dpi)).arg(strGost()));
+    cod.push_back(QString::fromUtf8("BLOCK %1,%2,%3,%4,\"0\",0,12,12,0,0,1,\"%5\"\n").arg(getDots(6.25,dpi)).arg(getDots(37.5,dpi)).arg(getDots(86.25,dpi)).arg(getDots(10,dpi)).arg(strGost()));
+    cod.push_back(QString::fromUtf8("BLOCK %1,%2,%3,%4,\"0\",0,10,10,0,0,1,\"%5\"\n").arg(getDots(6.25,dpi)).arg(getDots(47.5,dpi)).arg(getDots(86.25,dpi)).arg(getDots(15,dpi)).arg(ui->plainTextEdit->toPlainText()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Диаметр, мм - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(62.5,dpi)).arg(QLocale().toString(ui->lineEditDiam->text().toDouble(),'f',1)));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Плавка - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(67.5,dpi)).arg(ui->lineEditPlav->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Партия № %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(72.5,dpi)).arg(ui->lineEditPart->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Тип носителя - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(77.5,dpi)).arg(ui->lineEditSpool->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Дата изг. - %3\"\n").arg(getDots(45,dpi)).arg(getDots(62.5,dpi)).arg(ui->dateEdit->date().toString("dd.MM.yyyy")));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Масса нетто, кг - %3\"\n").arg(getDots(45,dpi)).arg(getDots(67.5,dpi)).arg(ui->lineEditKvo->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Упаковщик № %3\"\n").arg(getDots(45,dpi)).arg(getDots(72.5,dpi)).arg(ui->lineEditUpk->text()));
+    cod.push_back(QString::fromUtf8("BLOCK %1,%2,%3,%4,\"0\",0,10,10,0,0,1,\"%5\"\n").arg(getDots(6.25,dpi)).arg(getDots(82.5,dpi)).arg(getDots(86.25,dpi)).arg(getDots(25,dpi)).arg(getSert()));
     if (ui->checkBoxEan->isChecked() && !getEanPack().isEmpty()){
         cod.push_back(QString("BARCODE %1,%2,\"EAN13\",%3,2,0,%4,%5,\"%6\"\n").arg(getDots(46.25,dpi)).arg(getDots(13.75,dpi)).arg(getDots(12.5,dpi)).arg(getDots(0.375,dpi)).arg(getDots(0.375,dpi)).arg(getEanPack()));
     }
