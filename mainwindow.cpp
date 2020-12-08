@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionPack->setIcon(QIcon::fromTheme("document-print"));
     ui->actionPBig->setIcon(QIcon::fromTheme("document-print"));
     ui->actionPSmall->setIcon(QIcon::fromTheme("document-print"));
+    ui->actionPBigPal->setIcon(QIcon::fromTheme("document-print"));
     ui->actionExit->setIcon(this->style()->standardIcon(QStyle::SP_DialogCancelButton));
 
     ui->toolButtonSrc->setDefaultAction(ui->actionSrc);
@@ -34,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->toolButtonUpd->setDefaultAction(ui->actionPart);
     ui->toolButtonPBig->setDefaultAction(ui->actionPBig);
     ui->toolButtonPSmall->setDefaultAction(ui->actionPSmall);
+    ui->toolButtonPBigPal->setDefaultAction(ui->actionPBigPal);
 
     modelTu = new ModelRo(this);
     ui->listViewGost->setModel(modelTu);
@@ -79,6 +81,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionPack,SIGNAL(triggered(bool)),this,SLOT(createPackLabel()));
     connect(ui->actionPBig,SIGNAL(triggered(bool)),this,SLOT(createPBigLabel()));
     connect(ui->actionPSmall,SIGNAL(triggered(bool)),this,SLOT(createPSmallLabel()));
+    connect(ui->actionPBigPal,SIGNAL(triggered(bool)),this,SLOT(createPBigPalLabel()));
 
     connect(ui->actionSetPrintSrc,SIGNAL(triggered(bool)),this,SLOT(settingsPrintSrc()));
     connect(ui->actionSetPrintPack,SIGNAL(triggered(bool)),this,SLOT(settingsPrintPack()));
@@ -89,6 +92,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionViewPack,SIGNAL(triggered(bool)),this,SLOT(viewCmdPack()));
     connect(ui->actionViewPBig,SIGNAL(triggered(bool)),this,SLOT(viewCmdPBig()));
     connect(ui->actionViewPSmall,SIGNAL(triggered(bool)),this,SLOT(viewCmdPSmall()));
+    connect(ui->actionViewPBigPal,SIGNAL(triggered(bool)),this,SLOT(viewCmdPBigPal()));
 
     connect(ui->comboBoxOPart->lineEdit(),SIGNAL(editingFinished()),this,SLOT(setOrigPart()));
 
@@ -183,9 +187,34 @@ QString MainWindow::getCodPBig(int dpi)
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Упаковщик № %3\"\n").arg(getDots(45,dpi)).arg(getDots(65,dpi)).arg(ui->lineEditUpk->text()));
     cod.push_back(QString::fromUtf8("BLOCK %1,%2,%3,%4,\"0\",0,10,10,0,0,1,\"%5\"\n").arg(getDots(6.25,dpi)).arg(getDots(75,dpi)).arg(getDots(86.25,dpi)).arg(getDots(24.75,dpi)).arg(getSert()));
     if (ui->checkBoxEan->isChecked() && !getEanPack().isEmpty()){
-        cod.push_back(QString("BARCODE %1,%2,\"EAN13\",%3,2,0,%4,%5,\"%6\"\n").arg(getDots(46.25,dpi)).arg(getDots(6.25,dpi)).arg(getDots(12.5,dpi)).arg(getDots(0.375,dpi)).arg(getDots(0.375,dpi)).arg(getEanPack()));
+        cod.push_back(QString("BARCODE %1,%2,\"EAN13\",%3,2,0,%4,%5,\"%6\"\n").arg(getDots(50,dpi)).arg(getDots(6.25,dpi)).arg(getDots(12.5,dpi)).arg(getDots(0.375,dpi)).arg(getDots(0.375,dpi)).arg(getEanPack()));
     }
     cod.push_back(getOtkStamp(60,80,dpi));
+    cod.push_back(QString("PRINT %1\n").arg(ui->spinBox->value()));
+    return cod;
+}
+
+QString MainWindow::getCodPBigPal(int dpi)
+{
+    QString cod;
+    cod.push_back("DIRECTION 1,0\n");
+    cod.push_back("CLS\n");
+    cod.push_back("SIZE 100 mm,100 mm\n");
+    cod.push_back("GAP 2.8 mm\n");
+    cod.push_back("CODEPAGE 1251\n");
+    cod.push_back("DENSITY 15\n");
+    cod.push_back(QString("PUTBMP %1,%2,\"logo.BMP\",1,100\n").arg(getDots(6.25,dpi)).arg(getDots(31,dpi)));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Марка - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(30,dpi)).arg(ui->lineEditMark->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Диаметр, мм - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(35,dpi)).arg(QLocale().toString(ui->lineEditDiam->text().toDouble(),'f',1)));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Плавка - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(40,dpi)).arg(ui->lineEditPlav->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Партия № %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(45,dpi)).arg(ui->lineEditPart->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Тип носителя - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(50,dpi)).arg(ui->lineEditSpool->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Количество кассет - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(55,dpi)).arg(ui->lineEditKvoSpool->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Масса нетто, кг - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(60,dpi)).arg(ui->lineEditKvo->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Мастер - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(65,dpi)).arg(ui->lineEditMaster->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"ОТК - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(70,dpi)).arg(ui->comboBoxOtk->currentText()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Дата - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(75,dpi)).arg(ui->dateEditPack->date().toString("dd.MM.yyyy")));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,14,14,\"НЕ БРОСАТЬ\"\n").arg(getDots(35,dpi)).arg(getDots(85,dpi)));
     cod.push_back(QString("PRINT %1\n").arg(ui->spinBox->value()));
     return cod;
 }
@@ -363,7 +392,7 @@ void MainWindow::updPart()
     }
 
     QSqlQuery query;
-    query.prepare("select p.id, m.n_s, w.nam, d.diam, k.short, i.nam, m.dat, b.n_plav, wp.mas_ed, w.description, we.ean_ed, we.ean_group "
+    query.prepare("select p.id, m.n_s, w.nam, d.sdim, k.short, i.nam, m.dat, b.n_plav, wp.mas_ed, w.description, we.ean_ed, we.ean_group "
                   "from wire_parti as p "
                   "inner join wire_parti_m as m on p.id_m=m.id "
                   "inner join provol as w on m.id_provol=w.id "
@@ -393,6 +422,7 @@ void MainWindow::updPart()
             ui->tableViewPart->selectRow(modelPart->rowCount()-1);
         }
     }
+    ui->dateEditPack->setDate(QDate::currentDate());
 }
 
 void MainWindow::setOrigPart()
@@ -456,6 +486,12 @@ void MainWindow::createPackLabel()
 void MainWindow::createPBigLabel()
 {
     QString c=getCodPBig(printerPBig->getDpi());
+    printerPBig->printDecode(c);
+}
+
+void MainWindow::createPBigPalLabel()
+{
+    QString c=getCodPBigPal(printerPBig->getDpi());
     printerPBig->printDecode(c);
 }
 
@@ -527,6 +563,12 @@ void MainWindow::viewCmdPack()
 void MainWindow::viewCmdPBig()
 {
     DialogCmd c(getCodPBig(printerPBig->getDpi()),printerPBig);
+    c.exec();
+}
+
+void MainWindow::viewCmdPBigPal()
+{
+    DialogCmd c(getCodPBigPal(printerPBig->getDpi()),printerPBig);
     c.exec();
 }
 

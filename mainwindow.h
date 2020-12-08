@@ -37,6 +37,7 @@ private:
     QString getCodSrc(int dpi);
     QString getCodPack(int dpi);
     QString getCodPBig(int dpi);
+    QString getCodPBigPal(int dpi);
     QString getCodPSmall(int dpi);
     QString getNum(QComboBox *c);
     QString strGost();
@@ -60,6 +61,7 @@ private slots:
     void createSrcLabel();
     void createPackLabel();
     void createPBigLabel();
+    void createPBigPalLabel();
     void createPSmallLabel();
     void refreshDocType();
     void settingsPrintSrc();
@@ -69,6 +71,7 @@ private slots:
     void viewCmdSrc();
     void viewCmdPack();
     void viewCmdPBig();
+    void viewCmdPBigPal();
     void viewCmdPSmall();
 };
 
