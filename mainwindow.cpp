@@ -214,7 +214,7 @@ QString MainWindow::getCodPBigPal(int dpi)
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Мастер - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(65,dpi)).arg(ui->lineEditMaster->text()));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"ОТК - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(70,dpi)).arg(ui->comboBoxOtk->currentText()));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Дата - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(75,dpi)).arg(ui->dateEditPack->date().toString("dd.MM.yyyy")));
-    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,14,14,\"НЕ БРОСАТЬ\"\n").arg(getDots(35,dpi)).arg(getDots(85,dpi)));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,14,14,\"НЕ БРОСАТЬ!\"\n").arg(getDots(35,dpi)).arg(getDots(85,dpi)));
     cod.push_back(QString("PRINT %1\n").arg(ui->spinBox->value()));
     return cod;
 }
