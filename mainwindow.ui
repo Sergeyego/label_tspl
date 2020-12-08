@@ -350,9 +350,6 @@
           <item row="5" column="2" colspan="2">
            <widget class="QLineEdit" name="lineEditKvo"/>
           </item>
-          <item row="16" column="2" colspan="2">
-           <widget class="QLineEdit" name="lineEditMaster"/>
-          </item>
           <item row="17" column="0" colspan="2">
            <widget class="QLabel" name="label_20">
             <property name="text">
@@ -363,6 +360,13 @@
           <item row="17" column="2" colspan="2">
            <widget class="QDateEdit" name="dateEditPack">
             <property name="calendarPopup">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="16" column="2" colspan="2">
+           <widget class="QComboBox" name="comboBoxMaster">
+            <property name="editable">
              <bool>true</bool>
             </property>
            </widget>
@@ -593,6 +597,38 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>dateEditBeg</tabstop>
+  <tabstop>dateEditEnd</tabstop>
+  <tabstop>toolButtonUpd</tabstop>
+  <tabstop>lineEditMark</tabstop>
+  <tabstop>lineEditDiam</tabstop>
+  <tabstop>lineEditPlav</tabstop>
+  <tabstop>lineEditPart</tabstop>
+  <tabstop>lineEditSpool</tabstop>
+  <tabstop>lineEditKvo</tabstop>
+  <tabstop>dateEdit</tabstop>
+  <tabstop>comboBoxOPart</tabstop>
+  <tabstop>comboBoxNam</tabstop>
+  <tabstop>lineEditUpk</tabstop>
+  <tabstop>comboBoxOtk</tabstop>
+  <tabstop>listViewGost</tabstop>
+  <tabstop>plainTextEdit</tabstop>
+  <tabstop>tableViewOdobr</tabstop>
+  <tabstop>checkBoxEan</tabstop>
+  <tabstop>lineEditEanEd</tabstop>
+  <tabstop>lineEditEanGr</tabstop>
+  <tabstop>lineEditKvoSpool</tabstop>
+  <tabstop>comboBoxMaster</tabstop>
+  <tabstop>dateEditPack</tabstop>
+  <tabstop>spinBox</tabstop>
+  <tabstop>toolButtonSrc</tabstop>
+  <tabstop>toolButtonPack</tabstop>
+  <tabstop>toolButtonPSmall</tabstop>
+  <tabstop>toolButtonPBig</tabstop>
+  <tabstop>toolButtonPBigPal</tabstop>
+  <tabstop>tableViewPart</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

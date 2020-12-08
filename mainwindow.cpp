@@ -42,12 +42,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     modelOtk = new ModelRo(this);
     modelNam = new ModelRo(this);
+    modelMaster = new ModelRo(this);
 
     modelOdobr = new ModelRo(this);
     ui->tableViewOdobr->setModel(modelOdobr);
 
     ui->comboBoxOtk->setModel(modelOtk);
     ui->comboBoxNam->setModel(modelNam);
+    ui->comboBoxMaster->setModel(modelMaster);
 
     modelPartOrig = new ModelRo(this);
     ui->comboBoxOPart->setModel(modelPartOrig);
@@ -203,7 +205,7 @@ QString MainWindow::getCodPBigPal(int dpi)
     cod.push_back("GAP 2.8 mm\n");
     cod.push_back("CODEPAGE 1251\n");
     cod.push_back("DENSITY 15\n");
-    cod.push_back(QString("PUTBMP %1,%2,\"logo.BMP\",1,100\n").arg(getDots(6.25,dpi)).arg(getDots(31,dpi)));
+    cod.push_back(QString("PUTBMP %1,%2,\"logo.BMP\",1,100\n").arg(getDots(31,dpi)).arg(getDots(6.25,dpi)));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Марка - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(30,dpi)).arg(ui->lineEditMark->text()));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Диаметр, мм - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(35,dpi)).arg(QLocale().toString(ui->lineEditDiam->text().toDouble(),'f',1)));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Плавка - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(40,dpi)).arg(ui->lineEditPlav->text()));
@@ -211,7 +213,7 @@ QString MainWindow::getCodPBigPal(int dpi)
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Тип носителя - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(50,dpi)).arg(ui->lineEditSpool->text()));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Количество кассет - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(55,dpi)).arg(ui->lineEditKvoSpool->text()));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Масса нетто, кг - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(60,dpi)).arg(ui->lineEditKvo->text()));
-    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Мастер - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(65,dpi)).arg(ui->lineEditMaster->text()));
+    cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Мастер - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(65,dpi)).arg(ui->comboBoxMaster->currentText()));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"ОТК - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(70,dpi)).arg(ui->comboBoxOtk->currentText()));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Дата - %3\"\n").arg(getDots(6.25,dpi)).arg(getDots(75,dpi)).arg(ui->dateEditPack->date().toString("dd.MM.yyyy")));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,14,14,\"НЕ БРОСАТЬ!\"\n").arg(getDots(35,dpi)).arg(getDots(85,dpi)));
@@ -375,6 +377,21 @@ void MainWindow::updPart()
                      "order by rab");
     if (modelNam->execQuery(queryNam)){
         ui->comboBoxNam->setModelColumn(1);
+    }
+
+    QSqlQuery queryMaster;
+    queryMaster.prepare("select oj.id, e.first_name||' '||substr(e.last_name,1,1)||'. '||substr(e.middle_name,1,1)||'.' "
+                        "from wire_empl as e "
+                        "left outer join "
+                        "(select md.id_empl as id, p.nam as nam, p.id as idp from "
+                        "(select id_empl, max(dat) as mdat from (select * from wire_empl_pos_h where dat<= :dat ) as th group by id_empl) as md "
+                        "inner join wire_empl_pos_h h on (h.id_empl=md.id_empl and h.dat=md.mdat and h.id_op<>3) "
+                        "inner join wire_empl_pos as p on p.id=h.id_pos) as oj on e.id=oj.id "
+                        "where oj.idp=50 "
+                        "order by e.first_name, e.last_name, e.middle_name");
+    queryMaster.bindValue(":dat",ui->dateEditEnd->date());
+    if (modelMaster->execQuery(queryMaster)){
+        ui->comboBoxMaster->setModelColumn(1);
     }
 
     QSqlQuery queryOPart;

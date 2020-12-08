@@ -33,6 +33,7 @@ private:
     ModelRo *modelNam;
     ModelRo *modelOdobr;
     ModelRo *modelPartOrig;
+    ModelRo *modelMaster;
     QDataWidgetMapper *mapper;
     QString getCodSrc(int dpi);
     QString getCodPack(int dpi);
