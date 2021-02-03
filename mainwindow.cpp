@@ -403,7 +403,7 @@ void MainWindow::updPart()
                        "inner join wire_pack_kind as k on k.id=p.id_pack "
                        "where m.dat>= :dat "
                        "order by part desc");
-    queryOPart.bindValue(":dat",ui->dateEditBeg->date().addYears(-2));
+    queryOPart.bindValue(":dat",ui->dateEditBeg->date().addYears(-1));
     if (modelPartOrig->execQuery(queryOPart)){
         ui->comboBoxOPart->setModelColumn(1);
     }
