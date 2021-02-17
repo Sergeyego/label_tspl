@@ -157,11 +157,12 @@ QString MainWindow::getCodPack(int dpi)
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Дата изг. - %3\"\n").arg(getDots(45,dpi)).arg(getDots(62.5,dpi)).arg(ui->dateEdit->date().toString("dd.MM.yyyy")));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Масса нетто, кг - %3\"\n").arg(getDots(45,dpi)).arg(getDots(67.5,dpi)).arg(ui->lineEditKvo->text()));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Упаковщик № %3\"\n").arg(getDots(45,dpi)).arg(getDots(72.5,dpi)).arg(ui->lineEditUpk->text()));
-    cod.push_back(QString::fromUtf8("BLOCK %1,%2,%3,%4,\"0\",0,10,10,0,0,1,\"%5\"\n").arg(getDots(6.25,dpi)).arg(getDots(82.5,dpi)).arg(getDots(86.25,dpi)).arg(getDots(25,dpi)).arg(getSert()));
+    cod.push_back(QString::fromUtf8("BLOCK %1,%2,%3,%4,\"0\",0,10,10,0,0,1,\"%5\"\n").arg(getDots(6.25,dpi)).arg(getDots(82.5,dpi)).arg(getDots(86.25,dpi)).arg(getDots(18,dpi)).arg(getSert()));
+    cod.push_back(QString::fromUtf8("BLOCK %1,%2,%3,%4,\"0\",0,10,10,0,0,1,\"%5\"\n").arg(getDots(6.25,dpi)).arg(getDots(100.5,dpi)).arg(getDots(86.25,dpi)).arg(getDots(7,dpi)).arg(strAdr));
     if (ui->checkBoxEan->isChecked() && !getEanPack().isEmpty()){
         cod.push_back(QString("BARCODE %1,%2,\"EAN13\",%3,2,0,%4,%5,\"%6\"\n").arg(getDots(50,dpi)).arg(getDots(13.75,dpi)).arg(getDots(12.5,dpi)).arg(getDots(0.375,dpi)).arg(getDots(0.375,dpi)).arg(getEanPack()));
     }
-    cod.push_back(getOtkStamp(60,80,dpi));
+    cod.push_back(getOtkStamp(60,37.5,dpi));
     cod.push_back(QString("PRINT %1\n").arg(ui->spinBox->value()));
     return cod;
 }
@@ -187,11 +188,12 @@ QString MainWindow::getCodPBig(int dpi)
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Дата изг. - %3\"\n").arg(getDots(45,dpi)).arg(getDots(55,dpi)).arg(ui->dateEdit->date().toString("dd.MM.yyyy")));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Масса нетто, кг - %3\"\n").arg(getDots(45,dpi)).arg(getDots(60,dpi)).arg(ui->lineEditKvo->text()));
     cod.push_back(QString::fromUtf8("TEXT %1,%2,\"0\",0,12,12,\"Упаковщик № %3\"\n").arg(getDots(45,dpi)).arg(getDots(65,dpi)).arg(ui->lineEditUpk->text()));
-    cod.push_back(QString::fromUtf8("BLOCK %1,%2,%3,%4,\"0\",0,10,10,0,0,1,\"%5\"\n").arg(getDots(6.25,dpi)).arg(getDots(75,dpi)).arg(getDots(86.25,dpi)).arg(getDots(24.75,dpi)).arg(getSert()));
+    cod.push_back(QString::fromUtf8("BLOCK %1,%2,%3,%4,\"0\",0,10,10,0,0,1,\"%5\"\n").arg(getDots(6.25,dpi)).arg(getDots(75,dpi)).arg(getDots(86.25,dpi)).arg(getDots(18,dpi)).arg(getSert()));
+    cod.push_back(QString::fromUtf8("BLOCK %1,%2,%3,%4,\"0\",0,10,10,0,0,1,\"%5\"\n").arg(getDots(6.25,dpi)).arg(getDots(93,dpi)).arg(getDots(86.25,dpi)).arg(getDots(6.75,dpi)).arg(strAdr));
     if (ui->checkBoxEan->isChecked() && !getEanPack().isEmpty()){
         cod.push_back(QString("BARCODE %1,%2,\"EAN13\",%3,2,0,%4,%5,\"%6\"\n").arg(getDots(50,dpi)).arg(getDots(6.25,dpi)).arg(getDots(12.5,dpi)).arg(getDots(0.375,dpi)).arg(getDots(0.375,dpi)).arg(getEanPack()));
     }
-    cod.push_back(getOtkStamp(60,80,dpi));
+    cod.push_back(getOtkStamp(60,30,dpi));
     cod.push_back(QString("PRINT %1\n").arg(ui->spinBox->value()));
     return cod;
 }
@@ -299,13 +301,15 @@ QString MainWindow::getSert()
         if (!srtStr.isEmpty()){
             srtStr+="\n";
         }
-        srtStr+=docType.value(keys.at(i))+":";
+        srtStr+=docType.value(keys.at(i))+": ";
         QList<QString> v = srt.values(keys.at(i));
         qSort(v.begin(),v.end());
+        bool first=true;
         for (QString st:v){
-            if (!srtStr.isEmpty()){
-                srtStr+="\n";
+            if (!first){
+                srtStr+=", ";
             }
+            first=false;
             srtStr+=st;
         }
     }
@@ -406,6 +410,16 @@ void MainWindow::updPart()
     queryOPart.bindValue(":dat",ui->dateEditBeg->date().addYears(-1));
     if (modelPartOrig->execQuery(queryOPart)){
         ui->comboBoxOPart->setModelColumn(1);
+    }
+
+    QSqlQuery queryAdr;
+    queryAdr.prepare("select nam_lbl, adr from hoz where id=1");
+    if (queryAdr.exec()){
+        while (queryAdr.next()){
+            strAdr=QString::fromUtf8("Изготовитель ")+queryAdr.value(0).toString()+QString::fromUtf8(", ")+queryAdr.value(1).toString();
+        }
+    } else {
+        QMessageBox::critical(this,tr("Error"),queryAdr.lastError().text(),QMessageBox::Ok);
     }
 
     QSqlQuery query;

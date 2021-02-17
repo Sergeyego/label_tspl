@@ -54,6 +54,7 @@ private:
     QString getCod();
     int getDots(double mm, int dpi);
     QString getOtkStamp(double x, double y, int dpi);
+    QString strAdr;
 
 private slots:
     void updPart();
