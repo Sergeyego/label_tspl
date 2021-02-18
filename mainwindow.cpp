@@ -162,7 +162,7 @@ QString MainWindow::getCodPack(int dpi)
     if (ui->checkBoxEan->isChecked() && !getEanPack().isEmpty()){
         cod.push_back(QString("BARCODE %1,%2,\"EAN13\",%3,2,0,%4,%5,\"%6\"\n").arg(getDots(50,dpi)).arg(getDots(13.75,dpi)).arg(getDots(12.5,dpi)).arg(getDots(0.375,dpi)).arg(getDots(0.375,dpi)).arg(getEanPack()));
     }
-    cod.push_back(getOtkStamp(60,37.5,dpi));
+    cod.push_back(getOtkStamp(60,37,dpi));
     cod.push_back(QString("PRINT %1\n").arg(ui->spinBox->value()));
     return cod;
 }
@@ -193,7 +193,7 @@ QString MainWindow::getCodPBig(int dpi)
     if (ui->checkBoxEan->isChecked() && !getEanPack().isEmpty()){
         cod.push_back(QString("BARCODE %1,%2,\"EAN13\",%3,2,0,%4,%5,\"%6\"\n").arg(getDots(50,dpi)).arg(getDots(6.25,dpi)).arg(getDots(12.5,dpi)).arg(getDots(0.375,dpi)).arg(getDots(0.375,dpi)).arg(getEanPack()));
     }
-    cod.push_back(getOtkStamp(60,30,dpi));
+    cod.push_back(getOtkStamp(60,29.5,dpi));
     cod.push_back(QString("PRINT %1\n").arg(ui->spinBox->value()));
     return cod;
 }
@@ -307,12 +307,13 @@ QString MainWindow::getSert()
         bool first=true;
         for (QString st:v){
             if (!first){
-                srtStr+=", ";
+                srtStr+="; ";
             }
             first=false;
             srtStr+=st;
         }
     }
+    srtStr.replace("\"","");
     return srtStr;
 }
 
@@ -418,6 +419,7 @@ void MainWindow::updPart()
         while (queryAdr.next()){
             strAdr=QString::fromUtf8("Изготовитель ")+queryAdr.value(0).toString()+QString::fromUtf8(", ")+queryAdr.value(1).toString();
         }
+        strAdr.replace("\"","");
     } else {
         QMessageBox::critical(this,tr("Error"),queryAdr.lastError().text(),QMessageBox::Ok);
     }
