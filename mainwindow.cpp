@@ -97,6 +97,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionViewPBigPal,SIGNAL(triggered(bool)),this,SLOT(viewCmdPBigPal()));
 
     connect(ui->comboBoxOPart->lineEdit(),SIGNAL(editingFinished()),this,SLOT(setOrigPart()));
+    connect(ui->pushButtonGen,SIGNAL(clicked(bool)),this,SLOT(genEan()));
 
     connect(ui->actionExit,SIGNAL(triggered(bool)),this,SLOT(close()));
 
@@ -366,6 +367,40 @@ QString MainWindow::getOtkStamp(double x, double y, int dpi)
     return cod;
 }
 
+bool MainWindow::selectPart()
+{
+    QSqlQuery query;
+    query.prepare("select p.id, m.n_s, w.nam, d.sdim, k.short, i.nam, m.dat, b.n_plav, wp.mas_ed, w.description, we.ean_ed, we.ean_group "
+                  "from wire_parti as p "
+                  "inner join wire_parti_m as m on p.id_m=m.id "
+                  "inner join provol as w on m.id_provol=w.id "
+                  "inner join diam as d on m.id_diam=d.id "
+                  "inner join wire_pack_kind as k on p.id_pack=k.id "
+                  "inner join wire_source as i on m.id_source=i.id "
+                  "inner join prov_buht as b on m.id_buht=b.id "
+                  "inner join wire_pack as wp on wp.id = p.id_pack_type "
+                  "left join wire_ean as we on we.id_prov=m.id_provol and we.id_diam=m.id_diam and we.id_spool=p.id_pack and we.id_pack=p.id_pack_type "
+                  "where m.dat between :d1 and :d2 "
+                  "order by m.dat, m.n_s");
+    query.bindValue(":d1",ui->dateEditBeg->date());
+    query.bindValue(":d2",ui->dateEditEnd->date());
+    bool ok=modelPart->execQuery(query);
+    if (ok){
+        ui->tableViewPart->setColumnHidden(0,true);
+        ui->tableViewPart->resizeColumnsToContents();
+        modelPart->setHeaderData(1,Qt::Horizontal,QString::fromUtf8("Парт."));
+        modelPart->setHeaderData(2,Qt::Horizontal,QString::fromUtf8("Марка"));
+        modelPart->setHeaderData(3,Qt::Horizontal,QString::fromUtf8("Диам."));
+        modelPart->setHeaderData(4,Qt::Horizontal,QString::fromUtf8("Носитель"));
+        modelPart->setHeaderData(5,Qt::Horizontal,QString::fromUtf8("Источник"));
+        modelPart->setHeaderData(6,Qt::Horizontal,QString::fromUtf8("Дата"));
+        for (int i=7; i<modelPart->columnCount(); i++){
+            ui->tableViewPart->setColumnHidden(i,true);
+        }
+    }
+    return ok;
+}
+
 void MainWindow::updPart()
 {
     QSqlQuery queryOtk;
@@ -424,38 +459,36 @@ void MainWindow::updPart()
         QMessageBox::critical(this,tr("Error"),queryAdr.lastError().text(),QMessageBox::Ok);
     }
 
-    QSqlQuery query;
-    query.prepare("select p.id, m.n_s, w.nam, d.sdim, k.short, i.nam, m.dat, b.n_plav, wp.mas_ed, w.description, we.ean_ed, we.ean_group "
-                  "from wire_parti as p "
-                  "inner join wire_parti_m as m on p.id_m=m.id "
-                  "inner join provol as w on m.id_provol=w.id "
-                  "inner join diam as d on m.id_diam=d.id "
-                  "inner join wire_pack_kind as k on p.id_pack=k.id "
-                  "inner join wire_source as i on m.id_source=i.id "
-                  "inner join prov_buht as b on m.id_buht=b.id "
-                  "inner join wire_pack as wp on wp.id = p.id_pack_type "
-                  "left join wire_ean as we on we.id_prov=m.id_provol and we.id_diam=m.id_diam and we.id_spool=p.id_pack and we.id_pack=p.id_pack_type "
-                  "where m.dat between :d1 and :d2 "
-                  "order by m.dat, m.n_s");
-    query.bindValue(":d1",ui->dateEditBeg->date());
-    query.bindValue(":d2",ui->dateEditEnd->date());
-    if (modelPart->execQuery(query)){
-        ui->tableViewPart->setColumnHidden(0,true);
-        ui->tableViewPart->resizeColumnsToContents();
-        modelPart->setHeaderData(1,Qt::Horizontal,QString::fromUtf8("Парт."));
-        modelPart->setHeaderData(2,Qt::Horizontal,QString::fromUtf8("Марка"));
-        modelPart->setHeaderData(3,Qt::Horizontal,QString::fromUtf8("Диам."));
-        modelPart->setHeaderData(4,Qt::Horizontal,QString::fromUtf8("Носитель"));
-        modelPart->setHeaderData(5,Qt::Horizontal,QString::fromUtf8("Источник"));
-        modelPart->setHeaderData(6,Qt::Horizontal,QString::fromUtf8("Дата"));
-        for (int i=7; i<modelPart->columnCount(); i++){
-            ui->tableViewPart->setColumnHidden(i,true);
-        }
+    if (selectPart()){
         if (modelPart->rowCount()){
             ui->tableViewPart->selectRow(modelPart->rowCount()-1);
         }
     }
     ui->dateEditPack->setDate(QDate::currentDate());
+}
+
+void MainWindow::genEan()
+{
+    int id_part=ui->tableViewPart->model()->data(ui->tableViewPart->model()->index(ui->tableViewPart->currentIndex().row(),0),Qt::EditRole).toInt();
+    int indop=ui->comboBoxOPart->currentIndex();
+    QString mas=ui->lineEditKvo->text();
+    QSqlQuery query;
+    query.prepare("select * from add_ean_wire(:id_part)");
+    query.bindValue(":id_part",id_part);
+    if (query.exec()){
+        selectPart();
+        for (int i=0; i<ui->tableViewPart->model()->rowCount(); i++){
+            int id=ui->tableViewPart->model()->data(ui->tableViewPart->model()->index(i,0),Qt::EditRole).toInt();
+            if (id==id_part){
+                ui->tableViewPart->selectRow(i);
+                break;
+            }
+        }
+        ui->comboBoxOPart->setCurrentIndex(indop);
+        ui->lineEditKvo->setText(mas);
+    } else {
+        QMessageBox::critical(this,QString::fromUtf8("Ошибка"),query.lastError().text(),QMessageBox::Ok);
+    }
 }
 
 void MainWindow::setOrigPart()
@@ -466,6 +499,7 @@ void MainWindow::setOrigPart()
 void MainWindow::refreshData(QModelIndex index)
 {
     int id_part=ui->tableViewPart->model()->data(ui->tableViewPart->model()->index(index.row(),0),Qt::EditRole).toInt();
+    ui->pushButtonGen->setEnabled(ui->lineEditEanEd->text().isEmpty());
     QSqlQuery tuQuery;
     tuQuery.prepare("select g.nam from wire_parti_gost as w "
                     "inner join gost_new as g on w.id_gost=g.id "

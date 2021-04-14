@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1000</width>
-    <height>750</height>
+    <height>773</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -109,16 +109,6 @@
             </property>
            </widget>
           </item>
-          <item row="11" column="2" colspan="2">
-           <widget class="QListView" name="listViewGost">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>50</height>
-             </size>
-            </property>
-           </widget>
-          </item>
           <item row="6" column="0" colspan="2">
            <widget class="QLabel" name="label_9">
             <property name="text">
@@ -126,24 +116,10 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="2" colspan="2">
-           <widget class="QLineEdit" name="lineEditPlav">
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
           <item row="7" column="0" colspan="2">
            <widget class="QLabel" name="label_14">
             <property name="text">
              <string>Ориг. партия</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="2" colspan="2">
-           <widget class="QComboBox" name="comboBoxOPart">
-            <property name="editable">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -219,13 +195,6 @@
             </property>
            </widget>
           </item>
-          <item row="10" column="2" colspan="2">
-           <widget class="QComboBox" name="comboBoxOtk">
-            <property name="editable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
           <item row="16" column="0" colspan="2">
            <widget class="QLabel" name="label_19">
             <property name="text">
@@ -239,9 +208,6 @@
              <string>Кол-во кассет</string>
             </property>
            </widget>
-          </item>
-          <item row="9" column="2" colspan="2">
-           <widget class="QLineEdit" name="lineEditUpk"/>
           </item>
           <item row="12" column="0" colspan="2">
            <widget class="QLabel" name="label_11">
@@ -278,46 +244,8 @@
             </property>
            </widget>
           </item>
-          <item row="13" column="2" colspan="2">
-           <widget class="QTableView" name="tableViewOdobr">
-            <attribute name="verticalHeaderVisible">
-             <bool>false</bool>
-            </attribute>
-           </widget>
-          </item>
-          <item row="4" column="2" colspan="2">
-           <widget class="QLineEdit" name="lineEditSpool">
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
           <item row="14" column="2">
            <widget class="QLineEdit" name="lineEditEanEd">
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="2" colspan="2">
-           <widget class="QDateEdit" name="dateEdit">
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="15" column="2" colspan="2">
-           <widget class="QLineEdit" name="lineEditKvoSpool"/>
-          </item>
-          <item row="3" column="2" colspan="2">
-           <widget class="QLineEdit" name="lineEditPart">
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2" colspan="2">
-           <widget class="QLineEdit" name="lineEditDiam">
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -330,26 +258,6 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="2" colspan="2">
-           <widget class="QLineEdit" name="lineEditMark">
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="2" colspan="2">
-           <widget class="QComboBox" name="comboBoxNam">
-            <property name="editable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="12" column="2" colspan="2">
-           <widget class="QPlainTextEdit" name="plainTextEdit"/>
-          </item>
-          <item row="5" column="2" colspan="2">
-           <widget class="QLineEdit" name="lineEditKvo"/>
-          </item>
           <item row="17" column="0" colspan="2">
            <widget class="QLabel" name="label_20">
             <property name="text">
@@ -357,16 +265,115 @@
             </property>
            </widget>
           </item>
-          <item row="17" column="2" colspan="2">
+          <item row="14" column="4">
+           <widget class="QPushButton" name="pushButtonGen">
+            <property name="text">
+             <string>Генерировать</string>
+            </property>
+           </widget>
+          </item>
+          <item row="13" column="2" colspan="3">
+           <widget class="QTableView" name="tableViewOdobr">
+            <attribute name="verticalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
+           </widget>
+          </item>
+          <item row="15" column="2" colspan="3">
+           <widget class="QLineEdit" name="lineEditKvoSpool"/>
+          </item>
+          <item row="16" column="2" colspan="3">
+           <widget class="QComboBox" name="comboBoxMaster">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="17" column="2" colspan="3">
            <widget class="QDateEdit" name="dateEditPack">
             <property name="calendarPopup">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="16" column="2" colspan="2">
-           <widget class="QComboBox" name="comboBoxMaster">
+          <item row="12" column="2" colspan="3">
+           <widget class="QPlainTextEdit" name="plainTextEdit"/>
+          </item>
+          <item row="11" column="2" colspan="3">
+           <widget class="QListView" name="listViewGost">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>50</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="2" colspan="3">
+           <widget class="QComboBox" name="comboBoxOtk">
             <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="2" colspan="3">
+           <widget class="QLineEdit" name="lineEditUpk"/>
+          </item>
+          <item row="8" column="2" colspan="3">
+           <widget class="QComboBox" name="comboBoxNam">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="2" colspan="3">
+           <widget class="QComboBox" name="comboBoxOPart">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="2" colspan="3">
+           <widget class="QDateEdit" name="dateEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="2" colspan="3">
+           <widget class="QLineEdit" name="lineEditKvo"/>
+          </item>
+          <item row="4" column="2" colspan="3">
+           <widget class="QLineEdit" name="lineEditSpool">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2" colspan="3">
+           <widget class="QLineEdit" name="lineEditPart">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2" colspan="3">
+           <widget class="QLineEdit" name="lineEditPlav">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2" colspan="3">
+           <widget class="QLineEdit" name="lineEditDiam">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" colspan="3">
+           <widget class="QLineEdit" name="lineEditMark">
+            <property name="readOnly">
              <bool>true</bool>
             </property>
            </widget>

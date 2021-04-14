@@ -57,7 +57,9 @@ private:
     QString strAdr;
 
 private slots:
+    bool selectPart();
     void updPart();
+    void genEan();
     void setOrigPart();
     void refreshData(QModelIndex index);
     void createSrcLabel();
