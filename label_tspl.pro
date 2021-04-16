@@ -32,7 +32,10 @@ SOURCES += \
     modelro.cpp \
     dialogsettings.cpp \
     dialogcmd.cpp \
-    tprinter.cpp
+    tprinter.cpp \
+    labelbase.cpp \
+    labels.cpp \
+    formdata.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -40,13 +43,17 @@ HEADERS += \
     modelro.h \
     dialogsettings.h \
     dialogcmd.h \
-    tprinter.h
+    tprinter.h \
+    labelbase.h \
+    labels.h \
+    formdata.h
 
 FORMS += \
         mainwindow.ui \
     pgdialog.ui \
     dialogsettings.ui \
-    dialogcmd.ui
+    dialogcmd.ui \
+    formdata.ui
 
 RESOURCES += \
     res.qrc

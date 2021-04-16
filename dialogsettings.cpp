@@ -70,8 +70,8 @@ void DialogSettings::setLblSize(double width, double heiht, double gap)
 void DialogSettings::calibr()
 {
     QString cmd;
-    cmd+=QString("SIZE %1 mm, %2 mm\n").arg(ui->doubleSpinBoxHeiht->value()).arg(ui->doubleSpinBoxWidth->value());
-    cmd+=QString("BLINEDETECT %1, %2\n").arg(int(ui->doubleSpinBoxWidth->value()*printer->getDpi()/25)).arg(int(ui->doubleSpinBoxGap->value()*printer->getDpi()/25));
+    cmd+=QString("SIZE %1 mm, %2 mm\n").arg(ui->doubleSpinBoxWidth->value()).arg(ui->doubleSpinBoxHeiht->value());
+    cmd+=QString("BLINEDETECT %1, %2\n").arg(int(ui->doubleSpinBoxHeiht->value()*printer->getDpi()/25)).arg(int(ui->doubleSpinBoxGap->value()*printer->getDpi()/25));
     printer->printDecode(cmd);
 }
 

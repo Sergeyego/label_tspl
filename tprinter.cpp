@@ -66,8 +66,7 @@ int TPrinter::print(QByteArray &data)
 
 int TPrinter::printDecode(QString &data)
 {
-    QTextCodec *codec = QTextCodec::codecForName("Windows-1251");
-    QByteArray d=codec->fromUnicode(data);
+    QByteArray d=data.toUtf8();
     return print(d);
 }
 

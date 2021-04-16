@@ -2,16 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QSqlQuery>
-#include <QDataWidgetMapper>
-#include <QComboBox>
 #include <QSettings>
-#include <QMap>
-#include <QCompleter>
-#include "dialogsettings.h"
-#include "modelro.h"
-#include "dialogcmd.h"
-#include "tprinter.h"
+#include <QAction>
+#include <QToolButton>
+#include "formdata.h"
+#include "labels.h"
 
 namespace Ui {
 class MainWindow;
@@ -27,56 +22,18 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    ModelRo *modelPart;
-    ModelRo *modelTu;
-    ModelRo *modelOtk;
-    ModelRo *modelNam;
-    ModelRo *modelOdobr;
-    ModelRo *modelPartOrig;
-    ModelRo *modelMaster;
-    QDataWidgetMapper *mapper;
-    QString getCodSrc(int dpi);
-    QString getCodPack(int dpi);
-    QString getCodPBig(int dpi);
-    QString getCodPBigPal(int dpi);
-    QString getCodPSmall(int dpi);
-    QString getNum(QComboBox *c);
-    QString strGost();
-    QString getSert();
-    QMap <int, QString> docType;
-    QString getEanPack();
     void loadSettings();
     void saveSettings();
-    TPrinter *printerSrc;
-    TPrinter *printerPack;
-    TPrinter *printerPBig;
-    TPrinter *printerPSmall;
-    QString getCod();
-    int getDots(double mm, int dpi);
-    QString getOtkStamp(double x, double y, int dpi);
-    QString strAdr;
+    void createActions(LabelBase *l);
+    FormData *data;
+    LabelE801016 *labelE801016;
+    LabelG95110 *labelG95110;
+    LabelE4570 *labelE4570;
+    LabelG100100 *labelG100100;
+    LabelG100100Pal *labelG100100Pal;
 
 private slots:
-    bool selectPart();
-    void updPart();
-    void genEan();
-    void setOrigPart();
-    void refreshData(QModelIndex index);
-    void createSrcLabel();
-    void createPackLabel();
-    void createPBigLabel();
-    void createPBigPalLabel();
-    void createPSmallLabel();
-    void refreshDocType();
-    void settingsPrintSrc();
-    void settingsPrintPack();
-    void settingsPrintPBig();
-    void settingsPrintPSmall();
-    void viewCmdSrc();
-    void viewCmdPack();
-    void viewCmdPBig();
-    void viewCmdPBigPal();
-    void viewCmdPSmall();
+
 };
 
 #endif // MAINWINDOW_H
