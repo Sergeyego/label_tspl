@@ -27,9 +27,11 @@ private:
     TPrinter *printer;
 
 private slots:
-    void calibr();
     //void download();
     //void getSettings();
+
+signals:
+    void sigCalibrate();
 };
 
 #endif // DIALOGSETTINGS_H

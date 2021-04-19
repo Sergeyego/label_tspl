@@ -15,12 +15,12 @@ public:
     explicit LabelBase(QString nam, double w, double h, double g, FormData *d, QObject *parent = nullptr);
     void setActions(QAction *actionCfg, QAction *actionCmd, QAction *actionPrint);
     QString getName();
+    TPrinter *getPrinter();
 
 protected:
     double width;
     double height;
     double gap;
-    int dpi;
     QString name;
     FormData *data;
     TPrinter *printer;
@@ -41,6 +41,7 @@ public slots:
     void cfgPrinter();
     void viewCmd();
     void printLabel();
+    void calibrate();
 };
 
 #endif // LABELBASE_H

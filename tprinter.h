@@ -2,9 +2,8 @@
 #define TPRINTER_H
 
 #include <QObject>
-#include <QTcpSocket>
+//#include <QTcpSocket>
 #include <QMessageBox>
-#include <QTextCodec>
 #include <QSettings>
 #include <QApplication>
 #include <cups/cups.h>
@@ -21,16 +20,16 @@ public:
     int print(QByteArray &data);
     int printDecode(QString &data);
     QString getPrinterName();
-    QString getIp();
-    int getPort();
+    //QString getIp();
+    //int getPort();
     void loadSettings();
     void saveSettings();
     QStringList getPrinterList();
     int getDpi();
 
 private:
-    QString host;
-    int port;
+    //QString host;
+    //int port;
     QString pname;
     QString printer_name;
     int dpi;
@@ -38,8 +37,8 @@ private:
 signals:
 
 public slots:
-    void setHost(QString ip);
-    void setPort(int p);
+    //void setHost(QString ip);
+    //void setPort(int p);
     void setPrinterName(QString name);
     void setDpi(int d);
 };

@@ -15,7 +15,7 @@ DialogSettings::DialogSettings(TPrinter *p, QWidget *parent) :
 
     connect(ui->buttonBox,SIGNAL(accepted()),this,SLOT(accept()));
     connect(ui->buttonBox,SIGNAL(rejected()),this,SLOT(reject()));
-    connect(ui->pushButtonCal,SIGNAL(clicked(bool)),this,SLOT(calibr()));
+    connect(ui->pushButtonCal,SIGNAL(clicked(bool)),this,SIGNAL(sigCalibrate()));
     connect(ui->spinBoxDpi,SIGNAL(valueChanged(int)),printer,SLOT(setDpi(int)));
 
     connect(ui->comboBoxPrinters,SIGNAL(currentIndexChanged(QString)),printer,SLOT(setPrinterName(QString)));
@@ -66,14 +66,6 @@ void DialogSettings::setLblSize(double width, double heiht, double gap)
         }
     }
 }*/
-
-void DialogSettings::calibr()
-{
-    QString cmd;
-    cmd+=QString("SIZE %1 mm, %2 mm\n").arg(ui->doubleSpinBoxWidth->value()).arg(ui->doubleSpinBoxHeiht->value());
-    cmd+=QString("BLINEDETECT %1, %2\n").arg(int(ui->doubleSpinBoxHeiht->value()*printer->getDpi()/25)).arg(int(ui->doubleSpinBoxGap->value()*printer->getDpi()/25));
-    printer->printDecode(cmd);
-}
 
 /*void DialogSettings::download()
 {

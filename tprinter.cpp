@@ -46,8 +46,7 @@ TPrinter::~TPrinter()
 
 /*QByteArray TPrinter::printDecodeData(QString &data, int respTime)
 {
-    QTextCodec *codec = QTextCodec::codecForName("Windows-1251");
-    QByteArray d=codec->fromUnicode(data);
+    QByteArray d=data.toUtf8();
     return printData(d,respTime);
 }*/
 
@@ -75,15 +74,15 @@ QString TPrinter::getPrinterName()
     return printer_name;
 }
 
-void TPrinter::setHost(QString ip)
+/*void TPrinter::setHost(QString ip)
 {
     host=ip;
-}
+}*/
 
-void TPrinter::setPort(int p)
+/*void TPrinter::setPort(int p)
 {
     port=p;
-}
+}*/
 
 void TPrinter::setPrinterName(QString name)
 {
@@ -95,21 +94,21 @@ void TPrinter::setDpi(int d)
     dpi=d;
 }
 
-QString TPrinter::getIp()
+/*QString TPrinter::getIp()
 {
     return host;
-}
+}*/
 
-int TPrinter::getPort()
+/*int TPrinter::getPort()
 {
     return port;
-}
+}*/
 
 void TPrinter::loadSettings()
 {
     QSettings settings("szsm", QApplication::applicationName());
-    host=settings.value(pname+"_ip","192.168.1.118").toString();
-    port=settings.value(pname+"_port",9100).toInt();
+    //host=settings.value(pname+"_ip","192.168.1.118").toString();
+    //port=settings.value(pname+"_port",9100).toInt();
     printer_name=settings.value(pname+"_nam").toString();
     dpi=settings.value(pname+"_dpi",200).toInt();
 }
@@ -117,8 +116,8 @@ void TPrinter::loadSettings()
 void TPrinter::saveSettings()
 {
     QSettings settings("szsm", QApplication::applicationName());
-    settings.setValue(pname+"_ip",host);
-    settings.setValue(pname+"_port",port);
+    //settings.setValue(pname+"_ip",host);
+    //settings.setValue(pname+"_port",port);
     settings.setValue(pname+"_nam",printer_name);
     settings.setValue(pname+"_dpi",dpi);
 }
