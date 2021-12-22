@@ -105,8 +105,8 @@ QString LabelG100100::getCod()
     cod.push_back(text(45,55,QString::fromUtf8("Дата изг. - ")+data->datePart(),12));
     cod.push_back(text(45,60,QString::fromUtf8("Масса нетто, кг - ")+data->mas(),12));
     cod.push_back(text(45,65,QString::fromUtf8("Упаковщик № ")+data->upkNum(),12));
-    cod.push_back(block(6.25,75,86.25,18,data->getSert(),10));
-    cod.push_back(block(6.25,93,86.25,6.75,data->adr(),10));
+    cod.push_back(block(6.25,75,86.25,15,data->getSert(),10));
+    cod.push_back(block(6.25,90,86.25,7,data->adr(),10));
     cod.push_back(ean13(50,6.25,data->eanGr(),12.5,0.375));
     cod.push_back(otkStamp(60,29.5));
     cod.push_back(print());
